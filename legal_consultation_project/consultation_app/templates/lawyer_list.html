@@ -1,0 +1,82 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block content %}
+
+<!-- 🔷 Intro + Search in Flex Layout -->
+<div class="bg-blue-50 py-10">
+  <div class="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row justify-between items-start gap-6">
+    
+    <!-- 🔹 Intro Text (Left) -->
+    <div class="lg:w-2/3">
+      <h2 class="text-4xl font-bold text-blue-700 mb-4">Find the Right Lawyer for You</h2>
+      <p class="text-gray-600 text-lg">
+        Browse our verified list of professional lawyers across various specialties. Whether you need legal help for family, business, or criminal cases, you're in the right place.
+      </p>
+    </div>
+
+    <!-- 🔹 Search Bar (Right) -->
+    <div class="lg:w-1/3 w-full">
+      <form method="get" class="flex flex-col sm:flex-row items-center gap-3">
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ request.GET.q }}" 
+          placeholder="Search..." 
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button 
+          type="submit" 
+          class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
+          Search
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 🔷 Available Lawyers Section -->
+<div class="max-w-7xl mx-auto py-10 px-4">
+  <h1 class="text-3xl font-bold text-center mb-8">Available Lawyers for Consultation</h1>
+
+  <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {% for lawyer in lawyers %}
+    <div class="bg-white border rounded-xl shadow-md p-5 hover:shadow-xl hover:-translate-y-1 transition duration-300">
+      <div class="flex justify-center mb-4">
+        {% if lawyer.profile_picture %}
+          <img src="{{ lawyer.profile_picture.url }}" alt="Profile Picture" class="w-28 h-28 object-cover rounded-full border-4 border-blue-100">
+        {% else %}
+          <img src="{% static 'images/default-profile.png' %}" alt="Default Profile" class="w-28 h-28 object-cover rounded-full border-4 border-blue-100">
+        {% endif %}
+      </div>
+
+      <h2 class="text-xl font-semibold text-center">{{ lawyer.full_name }}</h2>
+      <p class="text-center text-gray-600">{{ lawyer.specialization }}</p>
+      <p class="text-sm text-center text-gray-500 mt-1">{{ lawyer.education }}</p>
+
+      <div class="text-center mt-2">
+        {% if lawyer.is_available %}
+          <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Available</span>
+        {% else %}
+          <span class="bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">Busy</span>
+        {% endif %}
+      </div>
+
+      <div class="text-yellow-400 text-center mt-2">
+        ★★★★☆ <span class="text-sm text-gray-500">(4.5)</span>
+      </div>
+
+      <div class="mt-4 flex justify-center space-x-2">
+        <a href="#" class="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition">View Profile</a>
+        <a href="#" class="text-white bg-green-600 px-4 py-2 rounded hover:bg-green-700 transition">Consult</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if not lawyers %}
+  <p class="text-center text-gray-500 mt-10">No lawyers available at the moment.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

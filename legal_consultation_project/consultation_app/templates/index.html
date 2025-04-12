@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+    {% block content %}
+   
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Add AOS (Animate On Scroll) library for scroll-based animation -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+    <script>
+        // Initialize AOS animation
+        AOS.init({
+            offset: 200, // Start animation after 200px scroll
+            duration: 1000, // Animation duration
+            easing: 'ease-in-out', // Smooth easing for the animation
+            once: true, // Animation triggers only once
+        });
+    </script>
+</head>
+<body class="bg-gray-100 font-sans">
+{% comment %} <body class="bg-gray-50"> {% endcomment %}
+
+    <!-- Hero Section -->
+    <section class="max-w-7xl mx-auto px-6 py-16 flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0">
+        <!-- Left Column: Text and Button -->
+        <div class="md:w-1/2 text-center md:text-left">
+            <h1 class="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+                Connect with professional lawyers <br>
+                <span class="text-blue-600">To Solve Your Legal Issues</span>
+            </h1>
+            <p class="text-lg text-gray-600 mb-6">
+                We make legal services accessible, fast, and affordable. Start your consultation today.
+            </p>
+
+            <!-- Call to Action Button -->
+            <button class="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300">
+                Start Your Consultation
+            </button>
+        </div>
+
+        <!-- Right Column: Image with Animation -->
+        <div class="md:w-2/4 relative">
+            <div class="w-full h-full rounded-xl shadow-lg overflow-hidden">
+                <!-- Add AOS data attribute for slide-in effect -->
+                <img src="{% static 'images/18.png' %}" alt="Legal Consultation"
+                    class="w-full h-full object-cover transition-transform transform duration-1000 ease-out"
+                    data-aos="slide-left" data-aos-duration="1500">
+            </div>
+        </div>
+    </section>
+
+
+
+
+    <!-- How It Works Section --
+    <section class="container mx-auto bg-white px-8 py-16 text-center">
+        <h2 class="text-4xl font-bold text-gray-900">How Online Legal Consultation System Works</h2>
+        <p class="text-gray-600 mt-2">Effortlessly connect with legal experts and enhance your consultation experience</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
+            <div class="bg-white p-6 shadow-md rounded-md">
+                <div class="text-blue-600 text-2xl font-bold">1</div>
+                <h3 class="text-lg font-semibold mt-2">Connect with Legal Experts Instantly</h3>
+                <p class="text-gray-600 mt-2">Bridge the gap between you and expert legal advice. Effortlessly schedule consultations with qualified lawyers.</p>
+            </div>
+            <div class="bg-white p-6 shadow-md rounded-md">
+                <div class="text-blue-600 text-2xl font-bold">2</div>
+                <h3 class="text-lg font-semibold mt-2">Customize Your Legal Experience</h3>
+                <p class="text-gray-600 mt-2">Tailor your consultation settings according to your preferences and schedule.</p>
+            </div>
+            <div class="bg-white p-6 shadow-md rounded-md">
+                <div class="text-blue-600 text-2xl font-bold">3</div>
+                <h3 class="text-lg font-semibold mt-2">Engage in Live Conversations</h3>
+                <p class="text-gray-600 mt-2">Communicate in real-time with legal professionals and receive immediate feedback.</p>
+            </div>
+            <div class="bg-white p-6 shadow-md rounded-md">
+                <div class="text-blue-600 text-2xl font-bold">4</div>
+                <h3 class="text-lg font-semibold mt-2">Trust in Robust Security Measures</h3>
+                <p class="text-gray-600 mt-2">We implement top-tier security protocols to protect your sensitive information.</p>
+            </div>
+        </div>
+    </section>
+     <!-- Transform Your Legal Experience Section -
+     <section class="container mx-auto px-8 py-16 flex flex-col md:flex-row items-center bg-gray-100 rounded-md">
+        <div class="md:w-1/2 flex justify-center">
+            <img src="{% static 'images/3.png' %}"  alt="Online Consultation" class="w-96">
+        </div>
+        <div class="md:w-1/2 space-y-4">
+            <h2 class="text-4xl font-bold text-gray-900">Transform Your Legal Experience with Online Consultations</h2>
+            <ul class="list-disc text-gray-600 ml-5 space-y-2">
+                <li>Schedule consultations with expert lawyers tailored to your specific needs.</li>
+                <li>Utilize flexible settings to customize your session according to your availability.</li>
+                <li>Engage in real-time chats for immediate assistance and clear communication.</li>
+                <li>Benefit from advanced security measures that protect your personal information during consultations.</li>
+            </ul>
+            <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-md inline-block hover:bg-blue-700">Book Your Consultation Today!</a>
+        </div>
+    </section>
+  
+   <!-- Transform Your Legal Experience Section -
+   <section class="container mx-auto px-8 py-16 flex flex-col md:flex-row items-center bg-gray-100 rounded-md">
+    <div class="md:w-1/2 space-y-4">
+        <h2 class="text-4xl font-bold text-gray-900">Elevate Your Legal Experience with Online Consultations</h2>
+        <p   class = "">Our innovative platform revolutionizes how you connect with legal professionals, 
+            allowing you to seek advice and support at your convenience.
+             Enjoy seamless consultations from the comfort of your home, 
+             tailored to meet your specific needs.</p>
+        <ul class="list-disc text-gray-600 ml-5 space-y-2">
+            <li>Schedule consultations with expert lawyers tailored to your specific needs.</li>
+            <li>Utilize flexible settings to customize your session according to your availability.</li>
+            <li>Engage in real-time chats for immediate assistance and clear communication.</li>
+            <li>Benefit from advanced security measures that protect your personal information during consultations.</li>
+        </ul>
+        <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-md inline-block hover:bg-blue-700">schedule your consultation now!</a>
+    </div>
+    <div class="md:w-1/2 flex justify-center bg-white-100">
+        <img src="{% static 'images/5.png' %}" alt="Online Consultation" class="w-96">
+    </div>
+</section>
+
+
+<!--artical section-->
+
+    <section class="bg-white py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8">Insights into Your Legal Needs</h2>
+            <p class="text-gray-600 text-center mb-12">
+                Discover valuable articles that empower you with knowledge about legal processes and how our online consultation system can enhance your access to legal support. Dive into our expert insights and stay informed.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="{% static 'images/7.png' %}" alt="Article 1" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <p class="text-xs text-gray-500 mb-2" id="date1"></p>
+                        <h3 class="text-xl font-semibold mb-2">Navigating Legal Processes with Ease</h3>
+                        <p class="text-gray-600 mb-4">Gain insights into how to efficiently navigate the complexities of legal consultations and improve your understanding of the legal landscape.</p>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold">READ MORE →</a>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="{% static 'images/8.png' %}" alt="Article 2" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <p class="text-xs text-gray-500 mb-2" id="date2"></p>
+                        <h3 class="text-xl font-semibold mb-2">Selecting the Right Attorney for Your Needs</h3>
+                        <p class="text-gray-600 mb-4">Explore tips on how to choose the right legal professional who aligns with your specific legal requirements and personal preferences.</p>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold">READ MORE →</a>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="{% static 'images/9.png' %}" alt="Article 3" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <p class="text-xs text-gray-500 mb-2" id="date3"></p>
+                        <h3 class="text-xl font-semibold mb-2">Safeguarding Your Legal Information Online</h3>
+                        <p class="text-gray-600 mb-4">Understand the importance of privacy in legal consultations and how our platform ensures the protection of your sensitive information.</p>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold">READ MORE →</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function setArticleDate(dateId) {
+            const dateElement = document.getElementById(dateId);
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = today.toLocaleString('default', { month: 'short' }).toUpperCase();
+            const year = today.getFullYear();
+            dateElement.textContent = `${day} ${month} ${year}`;
+        }
+
+        setArticleDate('date1');
+        setArticleDate('date2');
+        setArticleDate('date3');
+    </script>
+
+</body>
+</html>
+          
+
+
+    <!--footer section-->
+    <section class="bg-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                
+                <div class="md:w-1/2 mb-8 md:mb-0">
+                    <img src="{% static 'images/16.png' %}" alt="Legal Illustration" class="w-full"> 
+                </div>
+
+                <div class="md:w-1/2 md:pl-10">
+                    <h1 class="text-4xl font-bold mb-4">Experience Seamless Legal Consultations with Our Online Platform</h1>
+                    <p class="text-gray-600 mb-6">
+                        Our online legal consultation system connects you directly with experienced lawyers via live chat, ensuring you receive prompt and thorough legal guidance tailored to your needs. No matter where you are, expert support is just a click away!
+                    </p>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Start Your Online Consultation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    {% endblock content %}

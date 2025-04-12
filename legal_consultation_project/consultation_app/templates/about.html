@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="bg-gray-100 py-16">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <!-- Why Choose Us Section (No Introduction) -->
+    <div class="grid md:grid-cols-2 gap-10 mb-16">
+      <div class="flex justify-center">
+        <img src="{% static 'images/18.png' %}" alt="Legal Illustration" class="w-full h-auto max-w-md">
+      </div>
+
+      <!-- Why Choose Us Paragraph -->
+      <div>
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Why Choose Us</h3>
+        <p class="text-gray-700 leading-relaxed">
+          Our platform is designed with both clients and lawyers in mind. We provide a seamless and secure environment where clients can easily find specialized legal professionals. Lawyers can create detailed profiles to showcase their expertise, while clients can schedule consultations at their convenience. With real-time availability, verified information, and intuitive design, we simplify the process of accessing legal services.
+        </p>
+      </div>
+    </div>
+
+    <!-- Mission & Vision Section (Same Image) -->
+    <div class="grid md:grid-cols-2 gap-10 mb-16">
+      <!-- Mission Text -->
+      <div class="flex items-center justify-center">
+        <div class="max-w-md">
+          <h4 class="text-xl font-bold text-gray-800 mb-3">Our Mission</h4>
+          <p class="text-gray-600 leading-relaxed">
+            To simplify access to quality legal services for individuals and businesses by providing a trusted online environment where clients and lawyers connect with ease.
+          </p>
+        </div>
+      </div>
+
+      <!-- Image Placeholder for Mission and Vision (Same Image) -->
+      <div class="flex justify-center">
+        <img src="{% static 'images/13.png' %}" alt="Mission and Vision Image" class="w-full h-auto max-w-md rounded-xl shadow-md">
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-10">
+      <!-- Vision Text -->
+      <div class="flex items-center justify-center">
+        <div class="max-w-md">
+          <h4 class="text-xl font-bold text-gray-800 mb-3">Our Vision</h4>
+          <p class="text-gray-600 leading-relaxed">
+            To be the leading digital platform for legal consultations—where trust, transparency, and technology empower everyone to get the legal help they need without hassle.
+          </p>
+        </div>
+      </div>
+
+      <!-- Same Image for Vision -->
+      <div class="flex justify-center">
+        <img src="{% static 'images/11.png' %}" alt="Mission and Vision Image" class="w-full h-auto max-w-md rounded-xl shadow-md">
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
