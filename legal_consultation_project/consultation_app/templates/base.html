@@ -4,17 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Legal Consultation</title>
+    <title> Legal Consultation</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans">
     <!-- Navbar -->
     <nav class="flex justify-between items-center py-7 px-8 shadow-md bg-blue-400">
-        <h1 class="text-xl font-bold text-dark-700">Online Legal Consultation System</h1>
+        <h1 class="text-xl font-bold text-dark-700"> Legal Consultation platform</h1>
         <ul class="hidden md:flex space-x-6 text-gray-600">
             <li><a href="{% url 'home' %}" class="hover:text-dark-800">Home</a></li>
-            <li><a href="{% url 'lawyer_list' %}" class="hover:text-dark-800">Our Lawyers</a></li>
-            <li><a href="#" class="hover:text-dark-800">legal News & Information</a></li>
+            <li><a href="{% url 'lawyer_list' %}" class="hover:text-dark-800">Available Lawyers</a></li>
+            <li><a href="{% url 'legal_news_list' %}" class="hover:text-dark-800">legal News & Information</a></li>
             <li><a href="{% url 'about' %}" class="hover:text-dark-800">About Us</a></li>
         </ul>
         <div class="hidden md:flex space-x-4 relative">

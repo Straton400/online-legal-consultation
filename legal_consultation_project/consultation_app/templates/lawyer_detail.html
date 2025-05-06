@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg-gray-50 py-10">
+  <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md">
+    <!-- Profile Picture -->
+    <div class="flex flex-col items-center mb-6">
+      {% if lawyer.profile_picture %}
+        <img src="{{ lawyer.profile_picture.url }}" alt="Profile Picture" class="w-32 h-32 object-cover rounded-full border-4 border-blue-100">
+      {% else %}
+        <img src="{% static 'images/default-profile.png' %}" alt="Default Profile" class="w-32 h-32 object-cover rounded-full border-4 border-blue-100">
+      {% endif %}
+      <h1 class="text-2xl font-bold text-center mt-4">{{ lawyer.full_name }}</h1>
+      <span class="text-sm text-gray-600">{{ lawyer.specialization }}</span>
+    </div>
+
+    <!-- Details Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      <div>
+        <p><strong class="text-blue-600">Experience:</strong> {{ lawyer.experience }} years</p>
+        <p><strong class="text-blue-600">Education:</strong> {{ lawyer.education }}</p>
+        <p><strong class="text-blue-600">Location:</strong> {{ lawyer.location }}</p>
+        <p><strong class="text-blue-600">Phone:</strong> {{ lawyer.phone }}</p>
+        <p>
+          <strong class="text-blue-600">Status:</strong> 
+          {% if lawyer.is_available %}
+            <span class="text-green-600 font-semibold">Available</span>
+          {% else %}
+            <span class="text-red-600 font-semibold">Busy</span>
+          {% endif %}
+        </p>
+      </div>
+      <div>
+        <p><strong class="text-blue-600">Bio:</strong></p>
+        <p class="text-gray-700 whitespace-pre-line">{{ lawyer.bio }}</p>
+        
+        {% if lawyer.professional_certificate %}
+       
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="mt-8 text-center">
+      <a href="{% url 'lawyer_list' %}" class="inline-block bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded">Back to List</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

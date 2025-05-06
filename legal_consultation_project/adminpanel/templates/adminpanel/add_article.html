@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Article</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Add Legal Article</h2>
+        <form method="POST" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Submit Article
+            </button>
+        </form>
+        {% if messages %}
+            <div class="mt-4">
+                {% for message in messages %}
+                    <p class="text-green-600">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

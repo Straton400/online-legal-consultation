@@ -42,6 +42,7 @@ class LawyerProfileForm(forms.ModelForm):
             'bio',
             'phone',
             'location',
+            'professional_certificate',
             'profile_picture',
             'is_available'
         ]

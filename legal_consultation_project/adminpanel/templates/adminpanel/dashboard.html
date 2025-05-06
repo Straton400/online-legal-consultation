@@ -1,0 +1,25 @@
+{% extends 'adminpanel/admin_base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Dashboard Overview</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Total Lawyers -->
+    <div class="bg-white p-6 rounded shadow text-center">
+        <h2 class="text-lg font-semibold text-gray-700">Total Lawyers</h2>
+        <p class="text-3xl font-bold mt-4 text-blue-700">{{ total_lawyers }}</p>
+    </div>
+
+    <!-- Total Clients -->
+    <div class="bg-white p-6 rounded shadow text-center">
+        <h2 class="text-lg font-semibold text-gray-700">Total Clients</h2>
+        <p class="text-3xl font-bold mt-4 text-green-700">{{ total_clients }}</p>
+    </div>
+
+    <!-- Total Consultations -->
+    <div class="bg-white p-6 rounded shadow text-center">
+        <h2 class="text-lg font-semibold text-gray-700">Total Consultations</h2>
+        <p class="text-3xl font-bold mt-4 text-purple-700">{{ total_consultations }}</p>
+    </div>
+</div>
+{% endblock %}

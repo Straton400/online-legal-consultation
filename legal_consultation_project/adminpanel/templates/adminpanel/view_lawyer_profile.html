@@ -1,0 +1,74 @@
+{% extends "adminpanel/admin_base.html" %}
+
+{% block content %}
+<div class="p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4">Lawyer Profile</h2>
+
+    {% if profile %}
+        <table class="table-auto w-full border-collapse border border-gray-300">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 border border-gray-300 text-left">Field</th>
+                    <th class="px-4 py-2 border border-gray-300 text-left">Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Full Name:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.full_name }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Specialization:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.specialization }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Experience:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.experience }} years</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Education:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.education }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Bio:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.bio }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Phone:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.phone }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Location:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.location }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Available:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.is_available|yesno:"Yes,No" }}</td>
+                </tr>
+                <tr>
+                    <td class="px-4 py-2 border border-gray-300"><strong>Joined:</strong></td>
+                    <td class="px-4 py-2 border border-gray-300">{{ profile.created_at|date:"F d, Y" }}</td>
+                </tr>
+                 <tr>
+                <td class="px-4 py-2 border border-gray-300"><strong>certificate</strong></td>
+                <td class="px-4 py-2 border border-gray-300">
+                    {% if profile.professional_certificate %}
+                      <a href="{{ profile.professional_certificate.url }}" download class="text-blue-600 underline">
+                        view  Certificate
+                      </a>
+                    {% else %}
+                      No certificate uploaded
+                    {% endif %}
+                  </td>
+                </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-red-500">No profile available for this lawyer.</p>
+    {% endif %}
+
+    <a href="{% url 'manage_lawyers' %}" class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+        Back to Lawyers
+    </a>
+</div>
+{% endblock %}

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'consultation_app',
+    'adminpanel',
     'widget_tweaks'
 ]
 
@@ -81,7 +82,7 @@ DATABASES = {
       'ENGINE': 'django.db.backends.postgresql',
       'NAME': 'legal_system_db',
       'USER': 'postgres',
-      'PASSWORD': 'straton',
+      'PASSWORD': 'edna',
       'HOST': 'localhost',
       'PORT': '5432',
     }

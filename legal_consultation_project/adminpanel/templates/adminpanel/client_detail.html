@@ -1,0 +1,36 @@
+{% extends 'adminpanel/admin_base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Client Details</h1>
+
+<div class="overflow-x-auto">
+  <table class="min-w-full table-auto border border-gray-300">
+    <tbody>
+      <tr class="bg-gray-100">
+        <th class="text-left p-3 border font-semibold">Full Name</th>
+        <td class="p-3 border">{{ client.first_name }} {{ client.last_name }}</td>
+      </tr>
+      <tr>
+        <th class="text-left p-3 border font-semibold">Email</th>
+        <td class="p-3 border">{{ client.email }}</td>
+      </tr>
+      <tr class="bg-gray-100">
+        <th class="text-left p-3 border font-semibold">Phone</th>
+        <td class="p-3 border">{{ client.phone }}</td>
+      </tr>
+      <tr>
+        <th class="text-left p-3 border font-semibold">Status</th>
+        <td class="p-3 border">
+          {% if client.is_active %}
+            <span class="text-green-600 font-semibold">Active</span>
+          {% else %}
+            <span class="text-red-600 font-semibold">Inactive</span>
+          {% endif %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<a href="{% url 'admin_clients' %}" class="mt-6 inline-block bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition">← Back to Clients</a>
+{% endblock %}

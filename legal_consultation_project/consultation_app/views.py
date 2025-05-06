@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from .models import Lawyer  # Import your models
 from django.shortcuts import render, get_object_or_404
-
+from .models import Lawyer, Client, Consultation
+from django.db.models import Q
 # Create your views here.
 
 from django.shortcuts import render, redirect
@@ -11,8 +12,6 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from .forms import LawyerProfileForm, ClientRegistrationForm
 from .models import LawyerProfile
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import login_required
-from .models import LegalNews
 from .models import Client
 
 
@@ -117,32 +116,22 @@ def create_lawyer_profile(request):
 
 
 #view for list available lawyer
+
 def lawyer_list(request):
-    lawyers = LawyerProfile.objects.filter(is_available=True)  # show only available ones
+    query = request.GET.get('q')
+    if query:
+        lawyers = LawyerProfile.objects.filter(
+            Q(specialization__icontains=query)
+        )
+    else:
+        lawyers = LawyerProfile.objects.all()
+    
     return render(request, 'lawyer_list.html', {'lawyers': lawyers})
 
 #about view
 def about_page(request):
     return render(request, 'about.html')
 
-
-#view to handle legal news
-def legal_news(request):
-    # Fetch the latest legal news
-    latest_news = LegalNews.objects.all()
-    featured_news = LegalNews.objects.filter(is_featured=True)
-
-    context = {
-        'latest_news': latest_news,
-        'featured_news': featured_news,
-    }
-
-    return render(request, 'legal_news.html', context)
-
-
-def legal_news_detail(request, pk):
-    news_item = get_object_or_404(LegalNews, pk=pk)
-    return render(request, 'legal_news_detail.html', {'news_item': news_item})
 
 #client regestration 
 def client_register(request):
@@ -167,12 +156,54 @@ def client_login(request):
             client = Client.objects.get(email=email, password=password)
             request.session['client_id'] = client.id
             messages.success(request, 'Login successful')
-            return redirect('client_dashboard')  # You'll define this later
+            return redirect('client_dashboard')  # reeirect after loh in 
         except Client.DoesNotExist:
             messages.error(request, 'Invalid credentials')
     return render(request, 'login.html')
 
 # client dashboard
-@login_required
 def client_dashboard(request):
     return render(request, 'client_dashboard.html')
+
+
+#view for admin dashboard
+# views.py
+
+
+
+def admin_dashboard(request):
+    # Fetch total counts
+    total_lawyers = Lawyer.objects.count()
+    total_clients = Client.objects.count()
+    active_consultations = Consultation.objects.filter(status='active').count()
+
+    # Fetch recent activities (limit to 5 most recent activities)
+    recent_activities = Consultation.objects.all().order_by('-created_at')[:5]
+
+    # Pass the data to the template
+    context = {
+        'total_lawyers': total_lawyers,
+        'total_clients': total_clients,
+        'active_consultations': active_consultations,
+        'recent_activities': recent_activities,
+    }
+    return render(request, 'admin/dashboard.html', context)
+
+
+
+#legal news view
+from .models import LegalArticle
+
+def legal_news_list(request):
+    articles = LegalArticle.objects.all().order_by('-published_date')
+    return render(request, 'legal_news.html', {'articles': articles})
+
+def legal_news_detail(request, slug):
+    article = get_object_or_404(LegalArticle, slug=slug)
+    return render(request, 'legal_detail.html', {'article': article})
+
+
+#view to allow client to view the profile of lawyer
+def lawyer_detail(request, pk):
+    lawyer = get_object_or_404(LawyerProfile, pk=pk)
+    return render(request, 'lawyer_detail.html', {'lawyer': lawyer})
