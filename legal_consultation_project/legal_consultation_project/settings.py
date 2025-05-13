@@ -32,15 +32,19 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
     'consultation_app',
     'adminpanel',
-    'widget_tweaks'
+    'ChatApp',
+    'channels',
+    
 ]
 
 MIDDLEWARE = [
@@ -51,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+] 
 
 ROOT_URLCONF = 'legal_consultation_project.urls'
 
@@ -72,6 +76,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'legal_consultation_project.wsgi.application'
+ASGI_APPLICATION = "legal_consultation_project.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+}
 
 
 # Database
@@ -140,3 +149,4 @@ AUTH_USER_MODEL = 'consultation_app.lawyer'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+

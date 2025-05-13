@@ -1,26 +1,35 @@
 {% block title %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Legal Consultation</title>
+    <title>Legal Consultation Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans">
     <!-- Navbar -->
-    <nav class="flex justify-between items-center py-7 px-8 shadow-md bg-blue-400">
-        <h1 class="text-xl font-bold text-dark-700"> Legal Consultation platform</h1>
-        <ul class="hidden md:flex space-x-6 text-gray-600">
-            <li><a href="{% url 'home' %}" class="hover:text-dark-800">Home</a></li>
-            <li><a href="{% url 'lawyer_list' %}" class="hover:text-dark-800">Available Lawyers</a></li>
-            <li><a href="{% url 'legal_news_list' %}" class="hover:text-dark-800">legal News & Information</a></li>
-            <li><a href="{% url 'about' %}" class="hover:text-dark-800">About Us</a></li>
+    <nav class="flex justify-between items-center py-5 px-8 shadow-md bg-blue-400">
+        <!-- Logo Section -->
+        <div class="flex items-center space-x-2">
+            <img src="{% static 'images/19.jpg' %}" alt="Legal Consultation Logo" class="h-10 w-10">
+            <h1 class="text-2xl font-bold text-white">Legal Consultation Platform</h1>
+        </div>
+        
+        <!-- Navigation Links -->
+        <ul class="hidden md:flex space-x-6 text-white font-semibold">
+            <li><a href="{% url 'home' %}" class="hover:text-gray-300">Home</a></li>
+            <li><a href="{% url 'lawyer_list' %}" class="hover:text-gray-300">Available Lawyers</a></li>
+            <li><a href="{% url 'legal_news_list' %}" class="hover:text-gray-300">Legal News & Information</a></li>
+            <li><a href="{% url 'about' %}" class="hover:text-gray-300">About Us</a></li>
         </ul>
+        
+        <!-- Authentication Dropdowns -->
         <div class="hidden md:flex space-x-4 relative">
             <!-- Login Dropdown -->
             <div class="relative group">
-                <button class="text-gray-600 hover:text-blue-600 focus:outline-none">
+                <button class="text-white hover:text-gray-300 focus:outline-none">
                     Log In
                 </button>
                 <div class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block">
@@ -28,10 +37,10 @@
                     <a href="{% url 'lawyer_login' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Lawyer</a>
                 </div>
             </div>
-        
+
             <!-- Sign Up Dropdown -->
             <div class="relative group">
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none">
+                <button class="bg-white text-blue-600 px-4 py-2 rounded-md hover:bg-gray-100 focus:outline-none">
                     Sign Up
                 </button>
                 <div class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block">
@@ -40,6 +49,9 @@
                 </div>
             </div>
         </div>
+    </nav>
+
+
         
     </nav>
     {% endblock title %}

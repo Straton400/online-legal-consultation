@@ -13,6 +13,11 @@ from .forms import LawyerProfileForm, ClientRegistrationForm
 from .models import LawyerProfile
 from django.contrib.auth.decorators import login_required
 from .models import Client
+from .forms import ConsultationRequestForm
+from .models import Lawyer, Consultation
+
+from .forms import ConsultationUpdateForm
+
 
 
 def home(request):
@@ -73,7 +78,7 @@ def lawyer_login(request):
                 login(request, lawyer)
                 messages.success(request, f'Successfully logged in as {username}!')
                 # Redirect to the lawyer's dashboard or a success page
-                return redirect('lawyer_dashboard')  # Replace 'lawyer_dashboard' with your actual URL name
+                return redirect('lawyer_dashboard')  # 
             else:
                 messages.error(request, 'Invalid username or password.')
         else:
@@ -83,20 +88,43 @@ def lawyer_login(request):
     return render(request, 'lawyer_login.html', {'form': form})
 
 # lawyeer dashboard
+from .models import Consultation
+
+# views.py
+
 def lawyer_dashboard(request):
-    if request.user.is_authenticated and isinstance(request.user, Lawyer):
-        context = {
-            # You might have other context variables here
-        }
-        return render(request, 'lawyer_dashboard.html', context)
+    lawyer = request.user
+    consultations = Consultation.objects.filter(lawyer=lawyer).order_by('-requested_at')
+    
+    # Filter the consultations that are pending as notifications
+    pending_notifications = consultations.filter(status='pending')
+    
+    if request.method == 'POST':
+        consultation_id = request.POST.get('consultation_id')
+        consultation = get_object_or_404(Consultation, id=consultation_id)
+        
+        form = ConsultationUpdateForm(request.POST, instance=consultation)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Consultation status updated successfully!")
+            return redirect('lawyer_dashboard')
     else:
-        return redirect('lawyer_login')
+        form = ConsultationUpdateForm()
+
+    context = {
+        'consultations': consultations,
+        'notifications': pending_notifications,
+        'form': form,
+    }
+    return render(request, 'lawyer_base.html', context)
+
+
 def lawyer_logout(request):
     auth_logout(request)
     messages.success(request, 'Successfully logged out.')
     return redirect('home')
 
-@login_required
+
 def create_lawyer_profile(request):
     # Check if the lawyer already has a profile
     if hasattr(request.user, 'lawyerprofile'):  # Ensure you check for 'lawyerprofile', not 'lawyer'
@@ -116,15 +144,14 @@ def create_lawyer_profile(request):
 
 
 #view for list available lawyer
-
 def lawyer_list(request):
     query = request.GET.get('q')
     if query:
         lawyers = LawyerProfile.objects.filter(
             Q(specialization__icontains=query)
-        )
+        ).select_related('lawyer')
     else:
-        lawyers = LawyerProfile.objects.all()
+        lawyers = LawyerProfile.objects.all().select_related('lawyer')
     
     return render(request, 'lawyer_list.html', {'lawyers': lawyers})
 
@@ -156,15 +183,37 @@ def client_login(request):
             client = Client.objects.get(email=email, password=password)
             request.session['client_id'] = client.id
             messages.success(request, 'Login successful')
-            return redirect('client_dashboard')  # reeirect after loh in 
+
+            # Get the 'next' parameter and redirect there if it exists
+            next_page = request.GET.get('next')
+            if next_page:
+                return redirect(next_page)
+
+            # Default redirect if there is no 'next'
+            return redirect('client_dashboard')
+        
         except Client.DoesNotExist:
             messages.error(request, 'Invalid credentials')
+    
     return render(request, 'login.html')
+
 
 # client dashboard
 def client_dashboard(request):
-    return render(request, 'client_dashboard.html')
+    if not request.session.get('client_id'):
+        return redirect('client_login')
 
+    client_id = request.session.get('client_id')
+    client = Client.objects.get(id=client_id)
+
+    # Fetch all consultations for the client
+    consultations = Consultation.objects.filter(client=client).order_by('-requested_at')
+
+    context = {
+        'first_name': client.first_name,
+        'consultations': consultations  # Pass the consultations to the template
+    }
+    return render(request, 'client_base.html', context)
 
 #view for admin dashboard
 # views.py
@@ -207,3 +256,122 @@ def legal_news_detail(request, slug):
 def lawyer_detail(request, pk):
     lawyer = get_object_or_404(LawyerProfile, pk=pk)
     return render(request, 'lawyer_detail.html', {'lawyer': lawyer})
+
+
+
+#view to hundle consultation request to the laywer
+def consultation_requests_view(request):
+    # Get the logged-in lawyer object directly
+    lawyer = request.user
+    consultations = Consultation.objects.filter(lawyer=lawyer).order_by('-requested_at')
+
+    context = {
+        'consultations': consultations
+    }
+    return render(request, 'consultation_requests.html', context)
+
+
+#view to hundle cosultation detalis
+def consultation_detail_view(request, pk):
+    consultation = get_object_or_404(Consultation, pk=pk)
+
+    # Optional: restrict access so only the assigned lawyer can view it
+    if request.user != consultation.lawyer:
+        return redirect('lawyer_dashboard')
+
+    context = {
+        'consultation': consultation
+    }
+    return render(request, 'details_consultation.html', context)
+
+#view the client to request consultation 
+def request_consultation(request, lawyer_id):
+    # Check if user is logged in
+    if not request.session.get('client_id'):
+        # Redirect to login with the 'next' parameter
+        return redirect(f'/client-login/?next=/request-consultation/{lawyer_id}/')
+
+    lawyer = get_object_or_404(Lawyer, id=lawyer_id)
+
+    if request.method == 'POST':
+        form = ConsultationRequestForm(request.POST)
+        if form.is_valid():
+            consultation = form.save(commit=False)
+            consultation.client_id = request.session.get('client_id')
+            consultation.lawyer = lawyer
+            consultation.save()
+            return redirect('client_dashboard')
+    else:
+        form = ConsultationRequestForm()
+
+    return render(request, 'request_consultation.html', {'lawyer': lawyer, 'form': form})
+
+
+# view the lawyer to updte consulttion
+
+
+def update_consultation_status(request, consultation_id):
+    consultation = get_object_or_404(Consultation, id=consultation_id)
+
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        scheduled_time = request.POST.get('scheduled_time')
+        message_from_lawyer = request.POST.get('message_from_lawyer')
+
+        # Update status, scheduled time, and message
+        consultation.status = status
+        consultation.message_from_lawyer = message_from_lawyer
+        
+        if scheduled_time:
+            consultation.scheduled_time = scheduled_time
+
+        if status == 'accepted':
+            consultation.is_client_notified = False
+            consultation.is_lawyer_notified = True
+            messages.success(request, "Consultation Approved. The client will be notified.")
+        elif status == 'rejected':
+            consultation.is_client_notified = False
+            consultation.is_lawyer_notified = True
+            messages.warning(request, "Consultation Rejected. The client will be notified.")
+
+        consultation.save()
+        return redirect('consultation_requests')
+
+
+#view to fetch the consultation request of login client 
+def client_consultations_view(request):
+    # Fetch the client ID from the session
+    client_id = request.session.get('client_id')
+    
+    if not client_id:
+        return redirect('client_login')  # Redirect if not logged in
+    
+    # Get the client object
+    try:
+        client = Client.objects.get(id=client_id)
+    except Client.DoesNotExist:
+        return redirect('client_login')
+    
+    # Fetch all consultations for this client
+    consultations = Consultation.objects.filter(client=client).order_by('-requested_at')
+    
+    context = {
+        'consultations': consultations
+    }
+    return render(request, 'client_consultations.html', context)
+
+
+
+
+
+def delete_consultation(request, consultation_id):
+    consultation = get_object_or_404(Consultation, id=consultation_id)
+    
+    # Only allow deletion if the client is the owner of the request
+    if request.session.get('client_id') == consultation.client.id:
+        consultation.delete()
+        messages.success(request, "Consultation request successfully deleted.")
+    else:
+        messages.error(request, "You are not authorized to delete this request.")
+    
+    return redirect('client_consultations_view')

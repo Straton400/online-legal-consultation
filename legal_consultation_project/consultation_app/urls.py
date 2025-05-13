@@ -3,6 +3,10 @@ from . import views
 from .views import lawyer_register
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import consultation_requests_view, update_consultation_status, client_consultations_view
+from .views import delete_consultation
+
+
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -20,4 +24,18 @@ urlpatterns = [
     path('legal-news/', views.legal_news_list, name='legal_news_list'),
     path('lawyer/<int:pk>/', views.lawyer_detail, name='lawyer_detail'),
     path('legal-news/<slug:slug>/', views.legal_news_detail, name='legal_news_detail'),
+        
+    path('lawyer/consultation-requests/', consultation_requests_view, name='consultation_requests'),
+    path('update-consultation-status/<int:consultation_id>/', update_consultation_status, name='update_consultation_status'),
+
+
+   
+    path('lawyer/consultation/<int:pk>/', views.consultation_detail_view, name='consultation_detail'),
+    
+    path('request-consultation/<int:lawyer_id>/', views.request_consultation, name='request_consultation'),
+
+    path('my-consultations/', client_consultations_view, name='client_consultations'),
+
+    path('delete-consultation/<int:consultation_id>/', delete_consultation, name='delete_consultation'),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

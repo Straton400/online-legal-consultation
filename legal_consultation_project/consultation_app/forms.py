@@ -1,6 +1,7 @@
 from django import forms
 from .models import Lawyer
 from .models import LawyerProfile, Client
+from .models import Consultation
 
 class LawyerRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -57,3 +58,29 @@ class ClientRegistrationForm(forms.ModelForm):
     class Meta:
         model = Client
         fields = ['first_name', 'last_name', 'email', 'phone_number', 'password']
+
+
+#form for request consultation
+class ConsultationRequestForm(forms.ModelForm):
+    class Meta:
+        model = Consultation
+        fields = ['message']  # Only allow message for now
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Write your consultation request...'}),
+        }
+
+class ConsultationUpdateForm(forms.ModelForm):
+    scheduled_time = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        required=False,
+        label="Scheduled Time"
+    )
+    message_from_lawyer = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3}),
+        required=False,
+        label="Message to Client"
+    )
+
+    class Meta:
+        model = Consultation
+        fields = ['status', 'scheduled_time', 'message_from_lawyer']

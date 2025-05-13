@@ -60,9 +60,12 @@ def delete_lawyer(request, lawyer_id):
 #view lawyer
 
 def view_lawyer_profile(request, lawyer_id):
-    profile = get_object_or_404(LawyerProfile, lawyer_id=lawyer_id)
+    try:
+        profile = LawyerProfile.objects.get(lawyer_id=lawyer_id)
+    except LawyerProfile.DoesNotExist:
+        return render(request, 'adminpanel/no_profile_found.html')
+    
     return render(request, 'adminpanel/view_lawyer_profile.html', {'profile': profile})
-
 
 def admin_logout(request):
     logout(request)

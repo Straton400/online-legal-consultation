@@ -1,1 +1,3 @@
 # admin login username "ten" password = 1234
+
+#https://github.com/TheProtonGuy/DjangoChannelsChatApp 

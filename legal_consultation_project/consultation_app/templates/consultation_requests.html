@@ -1,0 +1,83 @@
+<!-- consultation_requests.html -->
+{% extends 'lawyer_base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h2 class="text-2xl font-semibold mb-4">Consultation Requests</h2>
+
+    {% if consultations %}
+        <table class="w-full border border-gray-300">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="p-2 border">Client Name</th>
+                    <th class="p-2 border">Message</th>
+                    <th class="p-2 border">Status</th>
+                    <th class="p-2 border">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for consultation in consultations %}
+              <tr>
+                  <td class="p-2 border">{{ consultation.client.first_name }}</td>
+                  <td class="p-2 border">{{ consultation.message }}</td>
+                  <td class="p-2 border">{{ consultation.status }}</td>
+                  <td class="p-2 border">
+                      {% if consultation.status|lower == 'pending' %}
+                          <!-- Modal Trigger -->
+                          <button onclick="openModal('{{ consultation.id }}')" 
+                                  class="bg-blue-500 text-white px-3 py-1 rounded">Respond</button>
+
+                          <!-- Modal -->
+                          <div id="modal-{{ consultation.id }}" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+                              <div class="bg-white p-6 rounded-lg w-1/2">
+                                  <h3 class="text-xl font-semibold mb-4">Respond to Consultation</h3>
+                                  <form method="post" action="{% url 'update_consultation_status' consultation.id %}">
+                                      {% csrf_token %}
+                                      
+                                      <!-- Status -->
+                                      <label class="block mb-2">Status:</label>
+                                      <select name="status" class="border p-2 w-full mb-4">
+                                          <option value="accepted">Accept</option>
+                                          <option value="rejected">Reject</option>
+                                      </select>
+
+                                      <!-- Scheduled Time -->
+                                      <label class="block mb-2">Scheduled Time:</label>
+                                      <input type="datetime-local" name="scheduled_time" class="border p-2 w-full mb-4">
+                                      
+                                      <!-- Message -->
+                                      <label class="block mb-2">Message to Client:</label>
+                                      <textarea name="message_from_lawyer" rows="4" class="border p-2 w-full mb-4" placeholder="Add a message..."></textarea>
+                                      
+                                      <!-- Buttons -->
+                                      <div class="flex justify-end">
+                                          <button type="button" onclick="closeModal('{{ consultation.id }}')" class="bg-gray-500 text-white px-3 py-1 rounded mr-2">Cancel</button>
+                                          <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded">Submit</button>
+                                      </div>
+                                  </form>
+                              </div>
+                          </div>
+                      {% else %}
+                          <span class="text-gray-500">{{ consultation.status }}</span>
+                      {% endif %}
+                  </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No consultation requests available.</p>
+    {% endif %}
+</div>
+
+<!-- Modal Script -->
+<script>
+    function openModal(id) {
+        document.getElementById(`modal-${id}`).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(`modal-${id}`).classList.add('hidden');
+    }
+</script>
+{% endblock %}

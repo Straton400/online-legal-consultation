@@ -1,0 +1,64 @@
+<!-- client_consultations.html -->
+{% extends 'client_base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h2 class="text-2xl font-semibold mb-4">My Consultation Requests</h2>
+
+    {% if consultations %}
+        <table class="w-full border-collapse">
+            <thead>
+                <tr>
+                    <th class="border p-2">Lawyer</th>
+                    <th class="border p-2">Message</th>
+                    <th class="border p-2">Requested At</th>
+                    <th class="border p-2">Status</th>
+                    <th class="border p-2">Scheduled Time</th>
+                    <th class="border p-2">Lawyer's Message</th>
+                    <th class="border p-2">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for consultation in consultations %}
+                    <tr>
+                        <td class="border p-2">{{ consultation.lawyer.lawyerprofile.full_name }}</td>
+                        <td class="border p-2">{{ consultation.message }}</td>
+                        <td class="border p-2">{{ consultation.requested_at }}</td>
+                        <td class="border p-2">
+                            {% if consultation.status == 'pending' %}
+                                <span class="text-yellow-500">{{ consultation.status }}</span>
+                            {% elif consultation.status == 'accepted' %}
+                                <span class="text-green-500">{{ consultation.status }}</span>
+                            {% else %}
+                                <span class="text-red-500">{{ consultation.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="border p-2">
+                            {% if consultation.scheduled_time %}
+                                {{ consultation.scheduled_time|date:"D, d M Y H:i" }}
+                            {% else %}
+                                <span class="text-gray-500">Not Scheduled</span>
+                            {% endif %}
+                        </td>
+                        <td class="border p-2">
+                            {% if consultation.message_from_lawyer %}
+                                {{ consultation.message_from_lawyer }}
+                            {% else %}
+                                <span class="text-gray-500">No Message</span>
+                            {% endif %}
+                        </td>
+                        <td class="border p-2">
+                            <form method="post" action="{% url 'delete_consultation' consultation.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-gray-600">You have no consultation requests.</p>
+    {% endif %}
+</div>
+{% endblock %}

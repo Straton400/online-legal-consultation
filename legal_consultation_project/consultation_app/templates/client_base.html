@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Consultation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Navbar -->
+    <nav class="flex justify-between items-center py-7 px-8 shadow-md bg-blue-400">
+        <h1 class="text-xl font-bold text-dark-700">Legal Consultation Platform</h1>
+        <ul class="hidden md:flex space-x-6 text-gray-600">
+            <li><a href="{% url 'home' %}" class="hover:text-dark-800">Home</a></li>
+            <li><a href="{% url 'lawyer_list' %}" class="hover:text-dark-800">Available Lawyers</a></li>
+            <li><a href="{% url 'legal_news_list' %}" class="hover:text-dark-800">Legal News & Information</a></li>
+            <li><a href="{% url 'about' %}" class="hover:text-dark-800">About Us</a></li>
+        </ul>
+
+        <div class="hidden md:flex space-x-4 relative">
+            <!-- Login Dropdown -->
+            <div class="relative group">
+                <button class="text-gray-600 hover:text-blue-600 focus:outline-none">
+                    Log In
+                </button>
+                <div class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block">
+                    <a href="{% url 'client_login' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Client</a>
+                    <a href="{% url 'lawyer_login' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Lawyer</a>
+                </div>
+            </div>
+
+            <!-- Sign Up Dropdown -->
+            <div class="relative group">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none">
+                    Sign Up
+                </button>
+                <div class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block">
+                    <a href="{% url 'client_register' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Client</a>
+                    <a href="{% url 'lawyer_register' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Lawyer</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="flex min-h-screen">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-xl p-6 hidden md:block">
+            <h2 class="text-2xl font-bold text-blue-600 mb-8">Client Panel</h2>
+            <nav class="space-y-4">
+                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
+                <a href="{% url 'lawyer_list' %}" class="block text-gray-700 hover:text-blue-600 font-medium">Find Lawyer</a>
+                <a href="{% url 'client_consultations' %}" class="block text-gray-700 hover:text-blue-600 font-medium">My Consultations</a>
+                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium">Messages</a>
+                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium">Profile</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        {% comment %} <main class="flex-1 p-6">
+            <div class="bg-white p-6 rounded-xl shadow mb-6">
+                <h1 class="text-2xl font-semibold mb-2">Welcome, {{ first_name }}!</h1>
+            </div> {% endcomment %}
+
+            {% block content %}
+            <!-- Additional content from child templates will go here -->
+            {% endblock %}
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-blue-100 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <nav class="mb-4">
+                <a href="{% url 'home' %}" class="text-gray-600 hover:text-gray-800 mx-2">Home</a>
+                <a href="#" class="text-gray-600 hover:text-gray-800 mx-2">Consultation Services</a>
+                <a href="{% url 'lawyer_list' %}" class="text-gray-600 hover:text-gray-800 mx-2">Our Lawyers</a>
+                <a href="#" class="text-gray-600 hover:text-gray-800 mx-2">FAQ</a>
+                <a href="{% url 'about' %}" class="text-gray-600 hover:text-gray-800 mx-2">About Us</a>
+                <a href="#" class="text-gray-600 hover:text-gray-800 mx-2">Contact Us</a>
+            </nav>
+            <div class="mb-4">
+                <a href="#" class="text-gray-600 hover:text-gray-800 mx-2">f</a>
+                <a href="#" class="text-gray-600 hover:text-gray-800 mx-2">x</a>
+                <a href="#" class="text-gray-600 hover:text-gray-800 mx-2">in</a>
+            </div>
+            <p class="text-gray-600">&copy; 2025 Online Legal Consultation System All Rights Reserved</p>
+        </div>
+    </footer>
+
+</body>
+</html>

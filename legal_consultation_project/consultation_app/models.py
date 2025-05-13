@@ -68,17 +68,27 @@ class Client(models.Model):
         return f'{self.first_name} {self.last_name}'
 
 
+
 class Consultation(models.Model):
-    lawyer = models.ForeignKey(Lawyer, on_delete=models.CASCADE)
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50)  # e.g., 'active', 'completed', 'pending'
-    created_at = models.DateTimeField(auto_now_add=True)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField(null=True, blank=True)
-    fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    # Defining choices for the consultation status
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+
+    client = models.ForeignKey('Client', on_delete=models.CASCADE, related_name='consultations')
+    lawyer = models.ForeignKey('Lawyer', on_delete=models.CASCADE, related_name='consultations')
+    message = models.TextField(blank=True, null=True, help_text="Optional message from client to lawyer")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    requested_at = models.DateTimeField(auto_now_add=True)
+    is_client_notified = models.BooleanField(default=False)  # New field
+    is_lawyer_notified = models.BooleanField(default=False)  # New field
+    scheduled_time = models.DateTimeField(null=True, blank=True, help_text="Scheduled date and time for the consultation")
+    message_from_lawyer = models.TextField(blank=True, null=True, help_text="Message or instructions from the lawyer")
 
     def __str__(self):
-        return f"Consultation with {self.client.name} on {self.start_time}"
+        return f"Consultation Request from {self.client} to {self.lawyer} - {self.status}"
+
+    class Meta:
+        ordering = ['-requested_at']

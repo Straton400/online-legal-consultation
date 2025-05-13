@@ -66,9 +66,12 @@
   
       <div class="mt-4 flex justify-center space-x-2">
         <a href="{% url 'lawyer_detail' lawyer.id %}" class="text-white bg-blue-600 px-4 py-2 rounded hover:bg-blue-700 transition">View Profile</a>
-        <a href="#" class="text-white bg-green-600 px-4 py-2 rounded hover:bg-green-700 transition">request Consultation</a>
+        <a href="{% url 'request_consultation' lawyer.lawyer.id %}?next={{ request.path }}" class="bg-green-600 text-white p-2 rounded">
+          Request Consultation
+      </a>
       </div>
     </div>
+
   {% empty %}
     <p class="text-center text-gray-500 mt-10">No lawyers available at the moment.</p>
   {% endfor %}
