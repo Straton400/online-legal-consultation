@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.shortcuts import redirect
-from consultation_app.models import LawyerProfile
+from consultation_app.models import LawyerProfile, LegalArticle
 from django.contrib.auth.hashers import check_password
 from .models import AdminUser
 from .forms import AdminLoginForm
@@ -122,7 +122,49 @@ def admin_add_article(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Article added successfully!")
-            return redirect('base_view')
+            return redirect('admin_dashboard')
     else:
         form = LegalArticleForm()
     return render(request, 'adminpanel/add_article.html', {'form': form})
+
+
+def manage_articles(request):
+    if request.method == 'POST':
+        article_id = request.POST.get('article_id')
+        if article_id:
+            # Update existing article
+            article = get_object_or_404(LegalArticle, id=article_id)
+            form = LegalArticleForm(request.POST, request.FILES, instance=article)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Article updated successfully!")
+        else:
+            # Add new article
+            form = LegalArticleForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Article added successfully!")
+        return redirect('manage_articles')
+    
+    articles = LegalArticle.objects.all()
+    form = LegalArticleForm()
+    return render(request, 'adminpanel/manage_articles.html', {'form': form, 'articles': articles})
+
+def delete_article(request, id):
+    article = get_object_or_404(LegalArticle, id=id)
+    article.delete()
+    messages.success(request, "Article deleted successfully!")
+    return redirect('manage_articles')
+
+# Edit Article View
+def edit_article(request, id):
+    article = get_object_or_404(LegalArticle, id=id)
+    if request.method == 'POST':
+        form = LegalArticleForm(request.POST, request.FILES, instance=article)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Article updated successfully!")
+            return redirect('manage_articles')
+    else:
+        form = LegalArticleForm(instance=article)
+    return render(request, 'manage_articles.html', {'form': form})

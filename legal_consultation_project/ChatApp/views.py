@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Room,Message
+
 # Create your views here.
 
 
@@ -34,3 +35,15 @@ def MessageView(request, room_name, username):
     }
     
     return render(request, 'chatapp/message.html', context)
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Room
+
+def chat_room(request, room_name):
+    room = get_object_or_404(Room, room_name=room_name)
+    return render(request, 'chatapp/message.html', {'room': room})
+
+def chat_room_view(request, room_name):
+    room = get_object_or_404(Room, room_name=room_name)
+    return render(request, 'ChatApp/message.html', {'room': room})

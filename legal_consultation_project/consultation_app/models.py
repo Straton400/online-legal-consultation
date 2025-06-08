@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
 
 class Lawyer(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
@@ -25,7 +26,6 @@ def upload_to_profile(instance, filename):
     
 class LawyerProfile(models.Model):
     lawyer = models.OneToOneField('consultation_app.Lawyer', on_delete=models.CASCADE, related_name='profile')
-
     full_name = models.CharField(max_length=255)
     specialization = models.CharField(max_length=100)
     experience = models.PositiveIntegerField(help_text="Years of experience")
@@ -75,6 +75,7 @@ class Consultation(models.Model):
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected'),
+        ('completed', 'Completed'),  
     ]
 
     client = models.ForeignKey('Client', on_delete=models.CASCADE, related_name='consultations')
@@ -86,9 +87,25 @@ class Consultation(models.Model):
     is_lawyer_notified = models.BooleanField(default=False)  # New field
     scheduled_time = models.DateTimeField(null=True, blank=True, help_text="Scheduled date and time for the consultation")
     message_from_lawyer = models.TextField(blank=True, null=True, help_text="Message or instructions from the lawyer")
+    room = models.ForeignKey('ChatApp.room', on_delete=models.SET_NULL, null=True, blank=True, related_name='consultations')
 
     def __str__(self):
         return f"Consultation Request from {self.client} to {self.lawyer} - {self.status}"
+    
+    def get_video_room_name(self):
+        return f"video_consult_{self.pk}"
 
     class Meta:
         ordering = ['-requested_at']
+
+
+
+
+class Notification(models.Model):
+    client = models.ForeignKey('Client', on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Notification for {self.client} - {self.message[:30]}"

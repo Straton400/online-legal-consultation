@@ -22,6 +22,7 @@ urlpatterns = [
     path("", include('consultation_app.urls')),
     path('adminpanel/', include('adminpanel.urls')), 
     path('live-chat/', include('ChatApp.urls')),
+    path('video-chat/', include('videochat.urls')),
 ]
 
 

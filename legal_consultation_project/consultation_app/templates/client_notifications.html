@@ -1,0 +1,25 @@
+{% extends 'client_base.html' %}
+{% block content %}
+
+<main class="flex-1 p-6 bg-gray-100 min-h-screen">
+    <div class="bg-white p-6 rounded-xl shadow mb-6">
+        <h1 class="text-2xl font-semibold mb-4 text-blue-600">Your Notifications</h1>
+
+        {% if notifications %}
+            <ul class="space-y-4">
+                {% for notification in notifications %}
+                    <li class="border border-gray-200 rounded-lg p-4 bg-blue-50 hover:bg-blue-100 transition">
+                        <div class="flex justify-between items-center">
+                            <p class="text-gray-800">{{ notification.message }}</p>
+                            <span class="text-sm text-gray-500">{{ notification.created_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600">You have no notifications at the moment.</p>
+        {% endif %}
+    </div>
+</main>
+
+{% endblock %}

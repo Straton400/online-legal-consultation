@@ -17,8 +17,9 @@
             <a href="{% url 'manage_lawyers' %}" class="block py-2 px-4 rounded hover:bg-blue-700">Manage Lawyers</a>
             <a href="{% url 'admin_clients' %}" class="block py-2 px-4 rounded hover:bg-blue-700">Manage Clients</a>
             <a href="#" class="block py-2 px-4 rounded hover:bg-blue-700">Consultations</a>
-            <a href="{% url 'admin_add_article' %}" class="block py-2 px-4 rounded hover:bg-blue-700">manage legalnews and updates</a>
-            <a href="#" class="block py-2 px-4 rounded hover:bg-blue-700">Settings</a>
+            <a href="{% url 'manage_articles' %}" class="block py-2 px-4 rounded hover:bg-blue-700">manage legalnews and updates</a>
+            <a href="{% url 'admin_add_article' %}" class="block py-2 px-4 rounded hover:bg-blue-700">add legalnews and updates</a>
+            {% comment %} <a href="#" class="block py-2 px-4 rounded hover:bg-blue-700">Settings</a> {% endcomment %}
         </nav>
     </aside>
 

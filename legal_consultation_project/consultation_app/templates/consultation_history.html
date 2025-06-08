@@ -1,0 +1,42 @@
+{% extends "lawyer_base.html" %}  
+
+{% block content %}
+<div class="container mx-auto p-6">
+  <h1 class="text-2xl font-semibold mb-6">Consultation History</h1>
+
+  {% if consultations %}
+    <table class="min-w-full border border-gray-300">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="border px-4 py-2 text-left">Client</th>
+          <th class="border px-4 py-2 text-left">Requested At</th>
+          <th class="border px-4 py-2 text-left">Scheduled Time</th>
+          <th class="border px-4 py-2 text-left">Client Message</th>
+          <th class="border px-4 py-2 text-left">Lawyer Notes</th>
+          <th class="border px-4 py-2 text-left">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for consultation in consultations %}
+        <tr class="hover:bg-gray-50">
+          <td class="border px-4 py-2">{{ consultation.client }}</td>
+          <td class="border px-4 py-2">{{ consultation.requested_at|date:"M d, Y H:i" }}</td>
+          <td class="border px-4 py-2">
+            {% if consultation.scheduled_time %}
+              {{ consultation.scheduled_time|date:"M d, Y H:i" }}
+            {% else %}
+              N/A
+            {% endif %}
+          </td>
+          <td class="border px-4 py-2">{{ consultation.message|default:"-" }}</td>
+          <td class="border px-4 py-2">{{ consultation.message_from_lawyer|default:"-" }}</td>
+          <td class="border px-4 py-2 capitalize">{{ consultation.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No consultation history found.</p>
+  {% endif %}
+</div>
+{% endblock %}

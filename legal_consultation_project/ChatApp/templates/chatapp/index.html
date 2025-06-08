@@ -1,3 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    
+
+    
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,14 +15,14 @@
 <body>
     <div class="parent">
         <div class="child">
-            <h1>Enter Room</h1>
+            <h1>Chart with laywer</h1>
             <form action="" method="POST">
                 {% csrf_token %}
                 <label for="">Username</label><br>
                 <input type="text" placeholder="Username" name="username" required><br>
                 <label for="">Room name</label><br>
                 <input type="text" placeholder="room name" name="room" required><br>
-                <center><button type="submit">Submit</button></center><br>
+                <center><button type="submit">JOIN</button></center><br>
             </form>
         </div>
     </div>
@@ -30,7 +36,7 @@
 }
 
 .parent {
-    background-color: #DAAD86;
+    background-color:rgb(148, 144, 140);
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -40,7 +46,7 @@
 
 .child {
     display: flex;
-    background-color: #659DBD;
+    background-color:rgb(68, 162, 216);
     height: 80vh;
     width: 50%;
     border-radius: 10px;
@@ -77,3 +83,4 @@ button:hover {
 }
 </style>
 </html>
+{% endblock content %}

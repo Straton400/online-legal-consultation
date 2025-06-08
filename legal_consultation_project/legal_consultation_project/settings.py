@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'adminpanel',
     'ChatApp',
     'channels',
+    'videochat',
     
 ]
 
@@ -77,6 +78,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'legal_consultation_project.wsgi.application'
 ASGI_APPLICATION = "legal_consultation_project.asgi.application"
+
+ASGI_APPLICATION = 'legal_consultation_project.asgi.application'
 
 CHANNEL_LAYERS = {
     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create or Join Room</title>
+</head>
+<body>
+    <h2>Create or Join a Video Room</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label>Room Name:</label>
+        <input type="text" name="room_name" required>
+        <button type="submit">Enter Room</button>
+    </form>
+</body>
+</html>

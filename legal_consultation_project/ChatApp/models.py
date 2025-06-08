@@ -11,6 +11,7 @@ class Message(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     sender = models.CharField(max_length=255)
     message = models.TextField()
+    file = models.FileField(upload_to='uploads/', null=True, blank=True)  # New field for file uploads
 
-    def __str(self):
-        return str(self.room)
+    def __str__(self):
+        return f"{self.sender} in {self.room}"

@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
-from .views import delete_lawyer, view_lawyer_profile
+from .views import delete_lawyer, view_lawyer_profile,manage_articles,delete_article
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.admin_dashboard, name='admin-dashboard'),
@@ -17,5 +19,10 @@ urlpatterns = [
     path('admin/articles/add/', views.admin_add_article, name='admin_add_article'),
 
 
+    path('manage-articles/', views.manage_articles, name='manage_articles'),
+    path('edit-article/<int:id>/', views.edit_article, name='edit_article'),
+    path('delete-article/<int:id>/', views.delete_article, name='delete_article'),
+
+
  
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

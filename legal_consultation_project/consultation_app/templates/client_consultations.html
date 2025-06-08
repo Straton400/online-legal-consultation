@@ -1,4 +1,3 @@
-<!-- client_consultations.html -->
 {% extends 'client_base.html' %}
 
 {% block content %}
@@ -9,7 +8,6 @@
         <table class="w-full border-collapse">
             <thead>
                 <tr>
-                    <th class="border p-2">Lawyer</th>
                     <th class="border p-2">Message</th>
                     <th class="border p-2">Requested At</th>
                     <th class="border p-2">Status</th>
@@ -20,40 +18,49 @@
             </thead>
             <tbody>
                 {% for consultation in consultations %}
-                    <tr>
-                        <td class="border p-2">{{ consultation.lawyer.lawyerprofile.full_name }}</td>
-                        <td class="border p-2">{{ consultation.message }}</td>
-                        <td class="border p-2">{{ consultation.requested_at }}</td>
-                        <td class="border p-2">
-                            {% if consultation.status == 'pending' %}
-                                <span class="text-yellow-500">{{ consultation.status }}</span>
-                            {% elif consultation.status == 'accepted' %}
-                                <span class="text-green-500">{{ consultation.status }}</span>
+                <tr>
+                    <td class="border p-2">{{ consultation.message }}</td>
+                    <td class="border p-2">{{ consultation.requested_at }}</td>
+                    <td class="border p-2">
+                        {% if consultation.status == 'pending' %}
+                            <span class="text-yellow-500">{{ consultation.status }}</span>
+                        {% elif consultation.status == 'accepted' %}
+                            <span class="text-green-500">{{ consultation.status }}</span>
+                        {% else %}
+                            <span class="text-red-500">{{ consultation.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="border p-2">
+                        {% if consultation.scheduled_time %}
+                            {{ consultation.scheduled_time|date:"D, d M Y H:i" }}
+                        {% else %}
+                            <span class="text-gray-500">Not Scheduled</span>
+                        {% endif %}
+                    </td>
+                    <td class="border p-2">
+                        {% if consultation.message_from_lawyer %}
+                            {{ consultation.message_from_lawyer }}
+                        {% else %}
+                            <span class="text-gray-500">No Message</span>
+                        {% endif %}
+                    </td>
+                    <td class="border p-2">
+                       {% if consultation.status == 'accepted' %}
+                            <a href="{% url 'video_chat_room' consultation.id %}" class="btn btn-primary">
+                                Join Video Call
+                            </a>
                             {% else %}
-                                <span class="text-red-500">{{ consultation.status }}</span>
+                            <p>Waiting for approval...</p>
                             {% endif %}
-                        </td>
-                        <td class="border p-2">
-                            {% if consultation.scheduled_time %}
-                                {{ consultation.scheduled_time|date:"D, d M Y H:i" }}
-                            {% else %}
-                                <span class="text-gray-500">Not Scheduled</span>
-                            {% endif %}
-                        </td>
-                        <td class="border p-2">
-                            {% if consultation.message_from_lawyer %}
-                                {{ consultation.message_from_lawyer }}
-                            {% else %}
-                                <span class="text-gray-500">No Message</span>
-                            {% endif %}
-                        </td>
-                        <td class="border p-2">
-                            <form method="post" action="{% url 'delete_consultation' consultation.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
+
+                        <form method="post" action="{% url 'delete_consultation' consultation.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded w-full">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

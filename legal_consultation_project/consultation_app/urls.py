@@ -3,7 +3,7 @@ from . import views
 from .views import lawyer_register
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import consultation_requests_view, update_consultation_status, client_consultations_view
+from .views import consultation_requests_view, update_consultation_status, client_consultations_view,Notification
 from .views import delete_consultation
 
 
@@ -29,13 +29,28 @@ urlpatterns = [
     path('update-consultation-status/<int:consultation_id>/', update_consultation_status, name='update_consultation_status'),
 
 
-   
     path('lawyer/consultation/<int:pk>/', views.consultation_detail_view, name='consultation_detail'),
     
     path('request-consultation/<int:lawyer_id>/', views.request_consultation, name='request_consultation'),
 
     path('my-consultations/', client_consultations_view, name='client_consultations'),
 
-    path('delete-consultation/<int:consultation_id>/', delete_consultation, name='delete_consultation'),
+    # path('delete-consultation/<int:consultation_id>/', delete_consultation, name='delete_consultation'),
+
+    path('delete-consultation/<int:consultation_id>/', views.delete_consultation, name='delete_consultation'),
+    path('client/logout/', views.client_logout, name='client_logout'),
+
+    path('consultation-history/', views.consultation_history_view, name='consultation_history'),
+
+    path('client/consultations/', views.client_consultations_view, name='client_consultations_view'),
+
+    path('client/notifications/', views.client_notifications, name='client_notifications'),
+
+
+    path('client/find-lawyer/', views.find_lawyer, name='find_lawyer'),
+
+    
+
+
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

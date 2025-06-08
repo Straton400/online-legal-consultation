@@ -1,10 +1,8 @@
 from django.shortcuts import render
-from .models import Lawyer  # Import your models
+from .models import Lawyer  
 from django.shortcuts import render, get_object_or_404
 from .models import Lawyer, Client, Consultation
 from django.db.models import Q
-# Create your views here.
-
 from django.shortcuts import render, redirect
 from .forms import LawyerRegistrationForm
 from django.contrib import messages
@@ -17,6 +15,7 @@ from .forms import ConsultationRequestForm
 from .models import Lawyer, Consultation
 
 from .forms import ConsultationUpdateForm
+from ChatApp.models import Room  
 
 
 
@@ -67,6 +66,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .forms import LawyerLoginForm
 
+
 def lawyer_login(request):
     if request.method == 'POST':
         form = LawyerLoginForm(request.POST)
@@ -76,9 +76,13 @@ def lawyer_login(request):
             lawyer = authenticate(request, username=username, password=password)
             if lawyer is not None:
                 login(request, lawyer)
+                # Add these lines for video chat
+                request.session['user_type'] = 'lawyer'
+                request.session['user_id'] = lawyer.id
+                
                 messages.success(request, f'Successfully logged in as {username}!')
                 # Redirect to the lawyer's dashboard or a success page
-                return redirect('lawyer_dashboard')  # 
+                return redirect('lawyer_dashboard')
             else:
                 messages.error(request, 'Invalid username or password.')
         else:
@@ -182,23 +186,27 @@ def client_login(request):
         try:
             client = Client.objects.get(email=email, password=password)
             request.session['client_id'] = client.id
+            # Add these lines for video chat
+            request.session['user_type'] = 'client'
+            request.session['user_id'] = client.id
+            
             messages.success(request, 'Login successful')
-
+             
             # Get the 'next' parameter and redirect there if it exists
             next_page = request.GET.get('next')
             if next_page:
                 return redirect(next_page)
-
+             
             # Default redirect if there is no 'next'
             return redirect('client_dashboard')
-        
+                 
         except Client.DoesNotExist:
             messages.error(request, 'Invalid credentials')
-    
+         
     return render(request, 'login.html')
-
-
 # client dashboard
+from consultation_app.models import Notification
+
 def client_dashboard(request):
     if not request.session.get('client_id'):
         return redirect('client_login')
@@ -206,12 +214,16 @@ def client_dashboard(request):
     client_id = request.session.get('client_id')
     client = Client.objects.get(id=client_id)
 
-    # Fetch all consultations for the client
+    # Fetch consultations
     consultations = Consultation.objects.filter(client=client).order_by('-requested_at')
+    
+    # Fetch notifications, e.g., last 5 unread or all
+    notifications = Notification.objects.filter(client=client).order_by('-created_at')[:5]
 
     context = {
         'first_name': client.first_name,
-        'consultations': consultations  # Pass the consultations to the template
+        'consultations': consultations,
+        'notifications': notifications,  # Add notifications to context
     }
     return render(request, 'client_base.html', context)
 
@@ -271,6 +283,7 @@ def consultation_requests_view(request):
     return render(request, 'consultation_requests.html', context)
 
 
+
 #view to hundle cosultation detalis
 def consultation_detail_view(request, pk):
     consultation = get_object_or_404(Consultation, pk=pk)
@@ -309,6 +322,10 @@ def request_consultation(request, lawyer_id):
 
 # view the lawyer to updte consulttion
 
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from .models import Consultation, Notification  # Import Notification model
+
 
 def update_consultation_status(request, consultation_id):
     consultation = get_object_or_404(Consultation, id=consultation_id)
@@ -318,25 +335,40 @@ def update_consultation_status(request, consultation_id):
         scheduled_time = request.POST.get('scheduled_time')
         message_from_lawyer = request.POST.get('message_from_lawyer')
 
-        # Update status, scheduled time, and message
         consultation.status = status
         consultation.message_from_lawyer = message_from_lawyer
-        
+
         if scheduled_time:
             consultation.scheduled_time = scheduled_time
 
         if status == 'accepted':
-            consultation.is_client_notified = False
+            # ✅ Create chat room if it doesn't exist
+            if not consultation.room:
+                room_name = f"consultation_{consultation.id}"
+                room, created = Room.objects.get_or_create(room_name=room_name)
+                consultation.room = room
+
+            consultation.is_client_notified = True
             consultation.is_lawyer_notified = True
-            messages.success(request, "Consultation Approved. The client will be notified.")
+
+            # Notification to client
+            Notification.objects.create(
+                client=consultation.client,
+                message=f"Your consultation request has been accepted by {consultation.lawyer}."
+            )
+            messages.success(request, "Consultation Approved. Client will be notified.")
+
         elif status == 'rejected':
-            consultation.is_client_notified = False
+            consultation.is_client_notified = True
             consultation.is_lawyer_notified = True
-            messages.warning(request, "Consultation Rejected. The client will be notified.")
+            Notification.objects.create(
+                client=consultation.client,
+                message=f"Your consultation request has been rejected by {consultation.lawyer}."
+            )
+            messages.warning(request, "Consultation Rejected. Client will be notified.")
 
         consultation.save()
-        return redirect('consultation_requests')
-
+        return redirect('consultation_requests')  
 
 #view to fetch the consultation request of login client 
 def client_consultations_view(request):
@@ -362,16 +394,53 @@ def client_consultations_view(request):
 
 
 
-
-
 def delete_consultation(request, consultation_id):
-    consultation = get_object_or_404(Consultation, id=consultation_id)
-    
-    # Only allow deletion if the client is the owner of the request
-    if request.session.get('client_id') == consultation.client.id:
+    if request.method == 'POST':
+        consultation = get_object_or_404(Consultation, id=consultation_id)
         consultation.delete()
-        messages.success(request, "Consultation request successfully deleted.")
-    else:
-        messages.error(request, "You are not authorized to delete this request.")
-    
-    return redirect('client_consultations_view')
+        return redirect('client_consultations_view')  # Ensure this name exists in your urls.py
+
+
+# lient logout view
+def client_logout(request):
+    request.session.flush()  # or del request.session['client_id']
+    return redirect('home')
+
+
+
+#consultationhistory view
+def consultation_history_view(request):
+    # Get the logged-in lawyer
+    lawyer = request.user
+
+    # Fetch consultations for this lawyer with status 'accepted' (treated as completed for now)
+    consultations = Consultation.objects.filter(lawyer=lawyer, status='accepted')
+
+    context = {
+        'consultations': consultations
+    }
+    return render(request, 'consultation_history.html', context)
+
+
+#view to hand notification
+def client_notifications(request):
+    if not request.session.get('client_id'):
+        return redirect('client_login')
+
+    client_id = request.session.get('client_id')
+    client = Client.objects.get(id=client_id)
+
+    notifications = Notification.objects.filter(client=client).order_by('-created_at')
+
+    context = {
+        'first_name': client.first_name,
+        'notifications': notifications,
+    }
+    return render(request, 'client_notifications.html', context)
+
+
+
+
+#client find lawyer
+def find_lawyer(request):
+    return render(request, 'find_lawyer.html')
