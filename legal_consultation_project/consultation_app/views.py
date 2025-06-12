@@ -76,9 +76,11 @@ def lawyer_login(request):
             lawyer = authenticate(request, username=username, password=password)
             if lawyer is not None:
                 login(request, lawyer)
-                # Add these lines for video chat
+               
+                 # ✅ Store data in session for use in chat/video
                 request.session['user_type'] = 'lawyer'
                 request.session['user_id'] = lawyer.id
+                request.session['username'] = lawyer.username  # ✅ Needed for message chat
                 
                 messages.success(request, f'Successfully logged in as {username}!')
                 # Redirect to the lawyer's dashboard or a success page
@@ -95,14 +97,28 @@ def lawyer_login(request):
 from .models import Consultation
 
 # views.py
+from django.utils.timezone import now
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from datetime import datetime
 
 def lawyer_dashboard(request):
-    lawyer = request.user
-    consultations = Consultation.objects.filter(lawyer=lawyer).order_by('-requested_at')
+    lawyer = request.user  # assuming user is the lawyer instance
     
-    # Filter the consultations that are pending as notifications
+    consultations = Consultation.objects.filter(lawyer=lawyer).order_by('-requested_at')
+
+    # Notifications = pending consultations
     pending_notifications = consultations.filter(status='pending')
     
+    # Counts for dashboard cards
+    today = now().date()
+    pending_count = consultations.filter(status='pending').count()
+    accepted_count = consultations.filter(status='accepted').count()
+    today_appointments_count = consultations.filter(
+        status='accepted',
+        scheduled_time__date=today
+    ).count()
+
     if request.method == 'POST':
         consultation_id = request.POST.get('consultation_id')
         consultation = get_object_or_404(Consultation, id=consultation_id)
@@ -119,6 +135,10 @@ def lawyer_dashboard(request):
         'consultations': consultations,
         'notifications': pending_notifications,
         'form': form,
+        # New counts added here:
+        'pending_count': pending_count,
+        'accepted_count': accepted_count,
+        'today_appointments_count': today_appointments_count,
     }
     return render(request, 'lawyer_base.html', context)
 
@@ -186,10 +206,11 @@ def client_login(request):
         try:
             client = Client.objects.get(email=email, password=password)
             request.session['client_id'] = client.id
-            # Add these lines for video chat
+            
+  
             request.session['user_type'] = 'client'
             request.session['user_id'] = client.id
-            
+            request.session['username'] = client.email  # ✅ Store the username
             messages.success(request, 'Login successful')
              
             # Get the 'next' parameter and redirect there if it exists
@@ -205,7 +226,8 @@ def client_login(request):
          
     return render(request, 'login.html')
 # client dashboard
-from consultation_app.models import Notification
+from django.utils.timezone import now
+from datetime import date
 
 def client_dashboard(request):
     if not request.session.get('client_id'):
@@ -217,15 +239,24 @@ def client_dashboard(request):
     # Fetch consultations
     consultations = Consultation.objects.filter(client=client).order_by('-requested_at')
     
-    # Fetch notifications, e.g., last 5 unread or all
+    # Stats
+    total_consultations = consultations.count()
+    pending_consultations = consultations.filter(status='pending').count()
+    todays_appointments = consultations.filter(scheduled_time__date=date.today()).count()
+
+    # Fetch latest notifications
     notifications = Notification.objects.filter(client=client).order_by('-created_at')[:5]
 
     context = {
         'first_name': client.first_name,
         'consultations': consultations,
-        'notifications': notifications,  # Add notifications to context
+        'notifications': notifications,
+        'total_consultations': total_consultations,
+        'pending_consultations': pending_consultations,
+        'todays_appointments': todays_appointments,
     }
-    return render(request, 'client_base.html', context)
+    return render(request, 'client_consultations.html', context)
+
 
 #view for admin dashboard
 # views.py
@@ -444,3 +475,18 @@ def client_notifications(request):
 #client find lawyer
 def find_lawyer(request):
     return render(request, 'find_lawyer.html')
+
+
+from .forms import FeedbackForm
+
+def provide_feedback(request):
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.client = request.user.client  # assuming user has a related client profile
+            feedback.save()
+            return redirect('client_dashboard')  # or any page you want
+    else:
+        form = FeedbackForm()
+    return render(request, 'provide_feedback.html', {'form': form})

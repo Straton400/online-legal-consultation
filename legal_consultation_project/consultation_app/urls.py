@@ -49,7 +49,7 @@ urlpatterns = [
 
     path('client/find-lawyer/', views.find_lawyer, name='find_lawyer'),
 
-    
+    path('client/provide-feedback/', views.provide_feedback, name='provide_feedback'),
 
 
 

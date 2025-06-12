@@ -109,3 +109,18 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.client} - {self.message[:30]}"
+
+
+
+
+
+
+
+class Feedback(models.Model):
+    client = models.ForeignKey('Client', on_delete=models.CASCADE)
+    comment = models.TextField()
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback from {self.client}"

@@ -26,12 +26,11 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-white shadow-xl p-6 hidden md:block">
             <nav class="space-y-4">
-                <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
                 <a href="{% url 'lawyer_list' %}" class="block text-gray-700 hover:text-blue-600 font-medium">Find Lawyer</a>
                 <a href="{% url 'client_consultations' %}" class="block text-gray-700 hover:text-blue-600 font-medium">My Consultations</a>
                 <a href="{% url 'client_notifications' %}" class="block text-gray-700 hover:text-blue-600 font-medium">
                 Notifications</a>
-                 <a href="" class="block text-gray-700 hover:text-blue-600 font-medium">provide feedback</a>
+                 <a href="{% url 'provide_feedback' %}" class="block text-gray-700 hover:text-blue-600 font-medium">provide feedback</a>
                 {% comment %} <a href="#" class="block text-gray-700 hover:text-blue-600 font-medium">join live chart</a> {% endcomment %}
             </nav>
         </aside>

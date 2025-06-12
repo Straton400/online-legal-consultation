@@ -84,3 +84,20 @@ class ConsultationUpdateForm(forms.ModelForm):
     class Meta:
         model = Consultation
         fields = ['status', 'scheduled_time', 'message_from_lawyer']
+
+from .models import Feedback
+
+# forms.py
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'placeholder': 'Write your feedback...',
+                'rows': 4
+            }),
+           
+        }

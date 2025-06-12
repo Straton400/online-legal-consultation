@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lawyer Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,12 +11,13 @@
             document.getElementById("main-content").innerHTML = '<p class="text-center text-gray-500">Loading...</p>';
 
             fetch(page)
-                .then(response => response.text())
-                .then(data => {
+                .then((response) => response.text())
+                .then((data) => {
                     document.getElementById("main-content").innerHTML = data;
                 })
-                .catch(error => {
-                    document.getElementById("main-content").innerHTML = '<p class="text-center text-red-500">Failed to load content.</p>';
+                .catch((error) => {
+                    document.getElementById("main-content").innerHTML =
+                        '<p class="text-center text-red-500">Failed to load content.</p>';
                 });
         }
     </script>
@@ -29,23 +29,26 @@
         <div class="flex flex-col items-center mb-6">
             <div class="relative w-20 h-20 rounded-full overflow-hidden border-4 border-gray-300">
                 {% if request.user.profile_picture %}
-                    <img src="{{ request.user.profile_picture.url }}" alt="Profile Picture" class="w-full h-full object-cover">
+                    <img src="{{ request.user.profile_picture.url }}" alt="Profile Picture" class="w-full h-full object-cover" />
                 {% else %}
-                    <div class="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 text-xl font-semibold">
-                        {{ request.user.username|slice:":1|upper" }}
+                    <div
+                        class="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 text-xl font-semibold">
+                        {{ request.user.username|slice:":1"|upper }}
                     </div>
                 {% endif %}
-                </div>
+            </div>
 
             <h2 class="text-lg font-semibold mt-3">{{ request.user.username }}</h2>
         </div>
 
         <nav class="mt-6">
-            <a href="{% url 'create_lawyer_profile' %}" class="block py-2 px-4 hover:bg-blue-700 rounded" onclick="loadPage('/profile/')">👤 Creat Profile</a>
-            <a href="{% url 'consultation_requests' %}" class="block py-2 px-4 hover:bg-blue-700 rounded" onclick="loadPage('/consultation-requests/')">📩 Consultation Requests</a>
-            <a href="{% url 'consultation_history' %}" class="block py-2 px-4 hover:bg-blue-700 rounded" onclick="loadPage('/consultation-history/')">📜 Consultation History</a>
-            {% comment %} <a href="{% url 'consultation_history' %}" class="block py-2 px-4 hover:bg-blue-700 rounded" onclick="loadPage('/consultation-history/')">📩 Join live chart</a> {% endcomment %}
-            </nav>
+            <a href="{% url 'create_lawyer_profile' %}" class="block py-2 px-4 hover:bg-blue-700 rounded"
+                onclick="loadPage('/profile/')">👤 Create Profile</a>
+            <a href="{% url 'consultation_requests' %}" class="block py-2 px-4 hover:bg-blue-700 rounded"
+                onclick="loadPage('/consultation-requests/')">📩 Consultation Requests</a>
+            <a href="{% url 'consultation_history' %}" class="block py-2 px-4 hover:bg-blue-700 rounded"
+                onclick="loadPage('/consultation-history/')">📜 Consultation History</a>
+        </nav>
 
         <a href="{% url 'lawyer_logout' %}" class="block mt-6 text-center bg-red-500 hover:bg-red-700 py-2 px-4 rounded">
             Logout
@@ -57,8 +60,25 @@
         <div class="bg-blue-900 text-white py-8 px-6 flex items-center">
             <h1 class="text-3xl font-bold flex-1">Welcome , {{ request.user.username }}!</h1>
         </div>
-    {% block content %}
-    
-    
-    
-    {% endblock content %}
+
+        {% block content %}
+        <div class="dashboard-cards flex space-x-6 p-6 bg-white shadow rounded mt-6 mx-6">
+            <div class="card flex-1 p-6 bg-yellow-100 rounded-lg text-center shadow-md">
+                <h3 class="text-lg font-semibold mb-2">Pending Consultations</h3>
+                <p class="text-4xl font-bold text-yellow-700">{{ pending_count }}</p>
+            </div>
+            <div class="card flex-1 p-6 bg-green-100 rounded-lg text-center shadow-md">
+                <h3 class="text-lg font-semibold mb-2">Accepted Consultations</h3>
+                <p class="text-4xl font-bold text-green-700">{{ accepted_count }}</p>
+            </div>
+            <div class="card flex-1 p-6 bg-blue-100 rounded-lg text-center shadow-md">
+                <h3 class="text-lg font-semibold mb-2">Today's Appointments</h3>
+                <p class="text-4xl font-bold text-blue-700">{{ today_appointments_count }}</p>
+            </div>
+        </div>
+        {% endblock content %}
+    </main>
+
+</body>
+
+</html>

@@ -1,8 +1,5 @@
 {% extends 'base.html' %}
-
 {% block content %}
-    
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,23 +9,21 @@
     <title>Messages</title>
     {% load static %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Add Font Awesome for better icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="parent">
         <div class="child-2">
-            <center><h2>welcome to chart room  </h2></center><hr>
+            <center><h2>Welcome to the Chat Room</h2></center><hr>
             <div class="chat-body-parent">
                 <div class="chat-body" id="tasks">
                     <div class="message" id="chatContainer">
                         {% for i in messages %}
-                            {% if i.sender != user %}
-                                <div class="receive">
-                                    <p style="color: #000;">{{i.message}} <strong>-{{i.sender}}</strong></p>
+                            {% if i.sender == user %}
+                                <div class="send">
+                                    <p style="color: #000;">{{ i.message }}</p>
                                     {% if i.file %}
                                         {% if i.file.url|slice:"-4:" == ".png" or i.file.url|slice:"-4:" == ".jpg" or i.file.url|slice:"-5:" == ".jpeg" %}
-
                                             <img src="{{ i.file.url }}" alt="Image" class="chat-image">
                                         {% else %}
                                             <a href="{{ i.file.url }}" target="_blank">📎 Download Attachment</a>
@@ -36,11 +31,10 @@
                                     {% endif %}
                                 </div>
                             {% else %}
-                                <div class="send">
-                                    <p style="color: #000;">{{i.message}}</p>
+                                <div class="receive">
+                                    <p style="color: #000;">{{ i.message }} <strong>-{{ i.sender }}</strong></p>
                                     {% if i.file %}
                                         {% if i.file.url|slice:"-4:" == ".png" or i.file.url|slice:"-4:" == ".jpg" or i.file.url|slice:"-5:" == ".jpeg" %}
-
                                             <img src="{{ i.file.url }}" alt="Image" class="chat-image">
                                         {% else %}
                                             <a href="{{ i.file.url }}" target="_blank">📎 Download Attachment</a>
@@ -56,19 +50,12 @@
                         <form action="" id="message-form" method="POST">
                             {% csrf_token %}
                             <textarea id="msg" cols="30" name="message" rows="2" placeholder="Enter your message"></textarea>
-                            
-                            <!-- Improved File Upload Button -->
                             <div class="file-upload-container">
-                                <label for="fileInput" class="file-upload-btn">
-                                    <i class="fa fa-paperclip"></i>
-                                </label>
+                                <label for="fileInput" class="file-upload-btn"><i class="fa fa-paperclip"></i></label>
                                 <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.zip,.rar" />
                                 <span id="fileName" class="file-name"></span>
                             </div>
-                            
-                            <button class="submit" type="submit">
-                                <i class="fa fa-paper-plane"></i> Send
-                            </button>
+                            <button class="submit" type="submit"><i class="fa fa-paper-plane"></i> Send</button>
                         </form>    
                     </div>
                 </div>
@@ -82,29 +69,22 @@
         var chatContainer = document.getElementById("chatContainer");
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
-    
-    // Add file name display functionality
+
     document.getElementById('fileInput').addEventListener('change', function() {
         const fileName = this.files[0] ? this.files[0].name : '';
         document.getElementById('fileName').textContent = fileName ? fileName.substring(0, 15) + (fileName.length > 15 ? '...' : '') : '';
     });
 
-    // Call scrollToBottom when the page loads
     window.onload = function() {
         scrollToBottom();
     };
 
     const websocketProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const wsEndpoint = `${websocketProtocol}://${window.location.host}/ws/notification/{{room_name}}/`;
+    const wsEndpoint = `${websocketProtocol}://${window.location.host}/ws/notification/{{ room_name }}/`;
     const socket = new WebSocket(wsEndpoint);
 
-    socket.onopen = (event) => {
-        console.log("WebSocket connection opened!");
-    };
-
-    socket.onclose = (event) => {
-        console.log("WebSocket connection closed!");
-    };
+    socket.onopen = () => console.log("WebSocket connection opened!");
+    socket.onclose = () => console.log("WebSocket connection closed!");
 
     document.getElementById('message-form').addEventListener('submit', function(event){
         event.preventDefault();
@@ -112,33 +92,27 @@
         const fileInput = document.getElementById('fileInput');
         const file = fileInput.files[0];
 
-        if (!message.trim() && !file) {
-            return; // Don't send empty messages with no file
-        }
+        if (!message.trim() && !file) return;
 
         if (file) {
             const reader = new FileReader();
             reader.onload = function(event) {
-                socket.send(
-                    JSON.stringify({
-                        'message': message,
-                        'file_data': event.target.result, // File data as Base64
-                        'file_name': file.name,
-                        'file_type': file.type,
-                        'room_name': '{{room_name}}',
-                        'sender': '{{user}}',
-                    })
-                );
+                socket.send(JSON.stringify({
+                    'message': message,
+                    'file_data': event.target.result,
+                    'file_name': file.name,
+                    'file_type': file.type,
+                    'room_name': '{{ room_name }}',
+                    'sender': '{{ user }}',
+                }));
             };
             reader.readAsDataURL(file);
         } else {
-            socket.send(
-                JSON.stringify({
-                    'message': message,
-                    'room_name': '{{room_name}}',
-                    'sender': '{{user}}',
-                })
-            );
+            socket.send(JSON.stringify({
+                'message': message,
+                'room_name': '{{ room_name }}',
+                'sender': '{{ user }}',
+            }));
         }
 
         document.getElementById('msg').value = '';
@@ -148,34 +122,32 @@
 
     socket.addEventListener("message", (event) => {
         const messageData = JSON.parse(event.data)['message'];
-        var sender = messageData['sender'];
-        var message = messageData['message'];
-        var fileUrl = messageData['file_url'];
+        const sender = messageData['sender'];
+        const message = messageData['message'];
+        const fileUrl = messageData['file_url'];
 
-        var messageDiv = document.querySelector('.message');
-        if (sender != '{{user}}') {
-            messageDiv.innerHTML += `
-                <div class="receive">
-                    <p style="color: #000;">${message} <strong>-${sender}</strong></p>
-                    ${fileUrl ? (fileUrl.match(/\.(jpeg|jpg|png)$/) ? `<img src="${fileUrl}" class="chat-image" />` : `<a href="${fileUrl}" target="_blank">📎 Download Attachment</a>`) : ''}
-                </div>`;
-        } else {
+        const messageDiv = document.querySelector('.message');
+
+        if (sender === '{{ user }}') {
             messageDiv.innerHTML += `
                 <div class="send">
                     <p style="color: #000;">${message}</p>
-                    ${fileUrl ? (fileUrl.match(/\.(jpeg|jpg|png)$/) ? `<img src="${fileUrl}" class="chat-image" />` : `<a href="${fileUrl}" target="_blank">📎 Download Attachment</a>`) : ''}
+                    ${fileUrl ? (/\.(jpeg|jpg|png)$/.test(fileUrl) ? `<img src="${fileUrl}" class="chat-image" />` : `<a href="${fileUrl}" target="_blank">📎 Download Attachment</a>`) : ''}
+                </div>`;
+        } else {
+            messageDiv.innerHTML += `
+                <div class="receive">
+                    <p style="color: #000;">${message} <strong>-${sender}</strong></p>
+                    ${fileUrl ? (/\.(jpeg|jpg|png)$/.test(fileUrl) ? `<img src="${fileUrl}" class="chat-image" />` : `<a href="${fileUrl}" target="_blank">📎 Download Attachment</a>`) : ''}
                 </div>`;
         }
+
         scrollToBottom();
     });
 </script>
 
 <style>
-    * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-    }
+    * { padding: 0; margin: 0; box-sizing: border-box; }
 
     .parent {
         background-color: #B1A296;
@@ -191,7 +163,7 @@
         margin: 10px;
         border-radius: 10px;
         padding: 10px;
-        background-color:rgb(172, 171, 167);
+        background-color: rgb(172, 171, 167);
     }
 
     .chat-body-parent {
@@ -202,7 +174,7 @@
 
     .chat-body, .message {
         width: 100%;
-        background-color:rgb(225, 224, 224);
+        background-color: rgb(225, 224, 224);
         border-radius: 10px;
         display: flex;
         padding: 10px;
@@ -222,13 +194,8 @@
         margin-bottom: 10px;
     }
 
-    .send {
-        align-self: flex-end;
-    }
-
-    .receive {
-        align-self: flex-start;
-    }
+    .send { align-self: flex-end; }
+    .receive { align-self: flex-start; }
 
     form {
         display: flex;
@@ -245,7 +212,6 @@
         border: 1px solid #ddd;
     }
 
-    /* Improved File Upload Button Styles */
     .file-upload-container {
         position: relative;
         display: flex;
@@ -260,12 +226,9 @@
         color: white;
         border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.3s;
     }
 
-    .file-upload-btn:hover {
-        background-color: #5D5C61;
-    }
+    .file-upload-btn:hover { background-color: #5D5C61; }
 
     #fileInput {
         position: absolute;
@@ -295,7 +258,6 @@
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.3s;
     }
 
     form button.submit:hover {

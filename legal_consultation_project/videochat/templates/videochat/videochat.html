@@ -12,7 +12,9 @@
     <h2 class="text-xl font-semibold text-gray-700">Room: {{ room_name }}</h2>
     <div class="space-x-2">
       <span id="callDuration" class="text-sm text-gray-600">Call Time: 00:00</span>
-      <a href="{% url 'create-room' %}" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 text-sm">Open Chat</a>
+
+       <a href="{% url 'room' room_name=room_name username=username %}">Join Chat</a>
+
       <button onclick="window.location.href='{% url 'lawyer_dashboard' %}'" class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 text-sm">Leave</button>
     </div>
   </div>

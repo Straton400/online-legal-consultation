@@ -24,16 +24,34 @@ def CreateRoom(request):
 
 
 
+from django.shortcuts import get_object_or_404
+from .models import Room, Message
+from consultation_app.models import Client, Lawyer  # update with your actual app name
+
 def MessageView(request, room_name, username):
-    get_room = Room.objects.get(room_name=room_name)
+    # Get the room (or create it if it doesn't exist)
+    get_room, _ = Room.objects.get_or_create(room_name=room_name)
+
+    # Get all messages for that room
     get_messages = Message.objects.filter(room=get_room)
-    
+
+    # If username is blank, fetch it from logged-in client/lawyer session
+    if not username:
+        if request.session.get('client_id'):
+            client = get_object_or_404(Client, id=request.session['client_id'])
+            username = client.email
+        elif request.session.get('lawyer_id'):
+            lawyer = get_object_or_404(Lawyer, id=request.session['lawyer_id'])
+            username = lawyer.username
+        else:
+            return redirect('login')  # fallback if not logged in
+
     context = {
         "messages": get_messages,
         "user": username,
         "room_name": room_name,
     }
-    
+
     return render(request, 'chatapp/message.html', context)
 
 
