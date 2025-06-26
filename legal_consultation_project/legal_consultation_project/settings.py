@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-l(+7i5g6ojbwb(zfo&_%p=czrl!uy@11tr_jm%s8t@xojcv7tz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ '172.20.8.178', '172.20.8.222','localhost', '127.0.0.1','0.0.0.0:8000']
 
 
 # Application definition
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'adminpanel',
     'ChatApp',
     'channels',
-    'videochat',
+    'video_app',
     
 ]
 
@@ -79,7 +79,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'legal_consultation_project.wsgi.application'
 ASGI_APPLICATION = "legal_consultation_project.asgi.application"
 
-ASGI_APPLICATION = 'legal_consultation_project.asgi.application'
+# ASGI_APPLICATION = 'legal_consultation_project.asgi.application'
 
 CHANNEL_LAYERS = {
     "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
@@ -137,7 +137,6 @@ USE_TZ = True
 
 
 
-
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
@@ -152,4 +151,14 @@ AUTH_USER_MODEL = 'consultation_app.lawyer'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Or your email provider
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'stratontarimo31@gmail.com'
+EMAIL_HOST_PASSWORD = 'lhha lfcn sqee wgyc' # Not your normal Gmail password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 

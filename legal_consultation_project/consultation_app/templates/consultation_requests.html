@@ -60,9 +60,21 @@
                        {% endif %}
 
                     {% if consultation.status == 'accepted' %}
-                        <a href="{% url 'video_chat_room' consultation.id %}" class="btn btn-primary">
+                    <div class="flex space-x-4 items-center">
+                        <a href="{% url 'index' 'testroom' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                             Join Video Call
                         </a>
+
+                        {% if consultation.room %}
+                        <a href="{% url 'chat' consultation.room.room_name %}" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                            Message Chat
+                        </a>
+
+                        {% else %}
+                            <span class="text-gray-500">No chat room</span>
+                        {% endif %}
+                    </div>
+                                
                         {% else %}
                         <p>Waiting for approval...</p>
                         {% endif %}

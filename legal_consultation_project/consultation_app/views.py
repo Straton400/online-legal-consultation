@@ -16,6 +16,7 @@ from .models import Lawyer, Consultation
 
 from .forms import ConsultationUpdateForm
 from ChatApp.models import Room  
+from django.core.mail import send_mail
 
 
 
@@ -357,6 +358,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from .models import Consultation, Notification  # Import Notification model
 
+from django.core.mail import send_mail  # Add this at the top of your views.py
 
 def update_consultation_status(request, consultation_id):
     consultation = get_object_or_404(Consultation, id=consultation_id)
@@ -387,19 +389,46 @@ def update_consultation_status(request, consultation_id):
                 client=consultation.client,
                 message=f"Your consultation request has been accepted by {consultation.lawyer}."
             )
+
+            # ✅ Send email to client
+            send_mail(
+                subject='Your Consultation Has Been Accepted',
+                message=f"Hello {consultation.client.first_name},\n\n"
+                        f"Your consultation with {consultation.lawyer.get_username()} has been accepted.\n"
+                        f"Please log in to your account to see the scheduled time and join the session.\n\n"
+                        f"Best regards,\nLegal Platform Team",
+                from_email=None,
+                recipient_list=[consultation.client.email],
+                fail_silently=False,
+            )
+
             messages.success(request, "Consultation Approved. Client will be notified.")
 
         elif status == 'rejected':
             consultation.is_client_notified = True
             consultation.is_lawyer_notified = True
+
             Notification.objects.create(
                 client=consultation.client,
                 message=f"Your consultation request has been rejected by {consultation.lawyer}."
             )
+
+            # ✅ Send email to client
+            send_mail(
+                subject='Your Consultation Has Been Rejected',
+                message=f"Hello {consultation.client.first_name},\n\n"
+                        f"Unfortunately, your consultation request was rejected by {consultation.lawyer.get_username()}.\n"
+                        f"You may submit a new request or select another lawyer.\n\n"
+                        f"Best regards,\nLegal Platform Team",
+                from_email=None,
+                recipient_list=[consultation.client.email],
+                fail_silently=False,
+            )
+
             messages.warning(request, "Consultation Rejected. Client will be notified.")
 
         consultation.save()
-        return redirect('consultation_requests')  
+        return redirect('consultation_requests')
 
 #view to fetch the consultation request of login client 
 def client_consultations_view(request):

@@ -35,6 +35,10 @@
     <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
       Register
     </button>
+    <p class="mt-4 text-center text-sm">
+  Already have an account?
+  <a href="{% url 'client_login' %}" class="text-blue-600 hover:underline">login here</a>
+</p>
 
     {% if messages %}
       <div class="mt-4">

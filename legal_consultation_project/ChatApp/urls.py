@@ -1,16 +1,6 @@
-from . import views
 from django.urls import path
-from .views import chat_room_view,MessageView
-
+from .views import message_view,  choose_login
 urlpatterns = [
-    path('', views.CreateRoom, name='create-room'),
-    path('<str:room_name>/<str:username>/', views.MessageView, name='room'),
-    path('chat-room/<str:room_name>/<str:username>/', views.MessageView, name='room'),
-
-    path('chat/<str:room_name>/', MessageView, name='chat-room'),
-    path('chat-room/<str:room_name>/<str:username>/', views.MessageView, name='room'),
-
-   path('live-chat/chat-room/<str:room_name>/<str:username>/', views.MessageView, name='room'),
-
-
+    path('chat-room/<str:room_name>/', message_view, name='chat'),
+    path('choose-login/', choose_login, name='choose_login')
 ]

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-1/2 mx-auto">
+<div class="bg-white p-6 sm:p-8 rounded-lg shadow-lg max-w-2xl w-full mx-auto">
 
     <h2 class="text-2xl font-semibold text-center mb-6">Lawyer Registration</h2>
 
@@ -12,7 +12,7 @@
         {% endfor %}
     {% endif %}
 
-    <form method="POST" class="space-y-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <form method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% csrf_token %}
 
         <!-- Username Field -->
@@ -33,9 +33,11 @@
             <input type="text" name="last_name" class="border-2 border-blue-500 p-2 rounded w-full" placeholder="Last Name">
         </div>
 
-      
-        
-        
+        <div>
+            <label class="block text-sm font-medium">email</label>
+            <input type="text" name="email" class="border-2 border-blue-500 p-2 rounded w-full" placeholder="email">
+        </div>
+
         <!-- Password Field -->
         <div>
             <label class="block text-sm font-medium">Password</label>
@@ -48,15 +50,16 @@
             <input type="password" name="confirm_password" class="border-2 border-blue-500 p-2 rounded w-full" placeholder="Confirm your password">
         </div>
 
-        <!-- Submit Button -->
-        <div class="col-span-2">
+        <!-- Submit Button spans both columns -->
+        <div class="md:col-span-2">
             <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
                 Register
             </button>
         </div>
     </form>
 
-    <p class="text-center text-sm mt-4">Already have an account? <a href="{% url 'lawyer_login' %}" class="text-blue-500">Login here</a></p>
+    <p class="text-center text-sm mt-4">Already have an account? 
+        <a href="{% url 'lawyer_login' %}" class="text-blue-500 hover:underline">Login here</a>
+    </p>
 </div>
-
 {% endblock content %}

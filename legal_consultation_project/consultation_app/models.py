@@ -7,6 +7,7 @@ class Lawyer(AbstractUser):
     username = models.CharField(max_length=100, unique=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
+    email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)  # Password should be encrypted
     is_verified = models.BooleanField(default=False)
     class Meta:

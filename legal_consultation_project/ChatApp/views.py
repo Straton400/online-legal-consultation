@@ -1,67 +1,38 @@
-from django.shortcuts import render, redirect
-from .models import Room,Message
-
-# Create your views here.
-
-
-def CreateRoom(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        room = request.POST.get('room')
-
-        try:
-            # Try to get the room if it exists
-            get_room = Room.objects.get(room_name=room)
-        except Room.DoesNotExist:
-            # If it doesn't exist, create a new one
-            get_room = Room.objects.create(room_name=room)
-        
-        # Redirect to the chat room
-        return redirect('room', room_name=room, username=username)
-
-    # Render the create room page if not POST request
-    return render(request, 'chatapp/index.html')
-
-
-
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Room, Message
-from consultation_app.models import Client, Lawyer  # update with your actual app name
+from consultation_app.models import Client, Lawyer
+def message_view(request, room_name):
+    room, _ = Room.objects.get_or_create(room_name=room_name)
 
-def MessageView(request, room_name, username):
-    # Get the room (or create it if it doesn't exist)
-    get_room, _ = Room.objects.get_or_create(room_name=room_name)
+    sender_id = request.session.get('user_id')
+    sender_type = request.session.get('user_type')
+    sender_name = None
 
-    # Get all messages for that room
-    get_messages = Message.objects.filter(room=get_room)
-
-    # If username is blank, fetch it from logged-in client/lawyer session
-    if not username:
-        if request.session.get('client_id'):
-            client = get_object_or_404(Client, id=request.session['client_id'])
-            username = client.email
-        elif request.session.get('lawyer_id'):
-            lawyer = get_object_or_404(Lawyer, id=request.session['lawyer_id'])
-            username = lawyer.username
+    if sender_type == 'client':
+        client = Client.objects.filter(id=sender_id).first()
+        if client:
+            sender_name = client.first_name or client.email
         else:
-            return redirect('login')  # fallback if not logged in
+            return redirect('client_login')
+    elif sender_type == 'lawyer':
+        lawyer = Lawyer.objects.filter(id=sender_id).first()
+        if lawyer:
+            sender_name = lawyer.username
+        else:
+            return redirect('lawyer_login')
+    else:
+        # Could be redirect to a landing/login page instead of hardcoded lawyer login
+        return redirect('client_login')
 
-    context = {
-        "messages": get_messages,
-        "user": username,
-        "room_name": room_name,
-    }
+    messages = Message.objects.filter(room=room).order_by('timestamp')
 
-    return render(request, 'chatapp/message.html', context)
+    return render(request, 'chatapp/message.html', {
+        'room_name': room_name,
+        'messages': messages,
+        'sender_id': sender_id,
+        'sender_type': sender_type,
+        'sender_name': sender_name,
+    })
 
-
-from django.shortcuts import render, get_object_or_404
-from .models import Room
-
-def chat_room(request, room_name):
-    room = get_object_or_404(Room, room_name=room_name)
-    return render(request, 'chatapp/message.html', {'room': room})
-
-def chat_room_view(request, room_name):
-    room = get_object_or_404(Room, room_name=room_name)
-    return render(request, 'ChatApp/message.html', {'room': room})
+def choose_login(request):
+    return render(request, 'consultation_app/choose_login.html')

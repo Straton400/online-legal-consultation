@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basic WebSocket WebRTC Video Call</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background-color: #f0f2f5;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      color: #007bff;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .video-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .video-box {
+      text-align: center;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      flex: 1;
+      min-width: 300px;
+    }
+    video {
+      width: 100%;
+      max-width: 380px;
+      height: auto;
+      border: 2px solid #007bff;
+      border-radius: 8px;
+      background-color: #222;
+      display: block;
+      margin: 0 auto 10px;
+    }
+    .controls {
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+    
+  <div class="container">
+    <h1>Real-Time Video Call lawyer and client</h1>
+
+    <button id="startCallButton">Start Video Call</button>
+    <hr>
+
+    <div class="video-container">
+      <div class="video-box">
+        <h2>Local Video</h2>
+        <video id="localVideo" autoplay muted playsinline></video>
+        <div class="controls">
+          <button id="toggleAudio"> Audio (On)</button>
+          <button id="toggleVideo"> Video (On)</button>
+        </div>
+      </div>
+      <div class="video-box">
+        <h2>Remote Video</h2>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const roomName = "{{ room_name }}";
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const wsPath = `${protocol}//${host}/ws/video_chat/${roomName}/`;
+    const ws = new WebSocket(wsPath);
+    
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const startCallButton = document.getElementById('startCallButton');
+    const toggleAudioButton = document.getElementById('toggleAudio');
+    const toggleVideoButton = document.getElementById('toggleVideo');
+
+    let localStream;
+    let peerConnection;
+    const configuration = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+      ]
+    };
+
+    navigator.mediaDevices?.enumerateDevices?.().then(devices => {
+      console.log("Available devices:", devices);
+    }).catch(err => {
+      console.error("Device listing failed:", err);
+    });
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+      startCallButton.disabled = false;
+    };
+
+    ws.onmessage = async (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Message from server:', data);
+
+      if (data.type === 'offer') {
+        if (!peerConnection) await initWebRTC(false);
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        ws.send(JSON.stringify({ type: 'answer', sdp: peerConnection.localDescription }));
+      } else if (data.type === 'answer') {
+        if (!peerConnection) return;
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+      } else if (data.type === 'ice-candidate') {
+        if (!peerConnection) return;
+        try {
+          await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        } catch (e) {
+          console.error("Error adding ICE candidate:", e);
+        }
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket closed.');
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+      localVideo.srcObject = null;
+      remoteVideo.srcObject = null;
+      startCallButton.disabled = false;
+      toggleAudioButton.disabled = true;
+      toggleVideoButton.disabled = true;
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    async function initWebRTC(isOfferer = true) {
+      if (peerConnection && peerConnection.connectionState !== 'closed') {
+        return;
+      }
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error("Your browser does not support camera access.");
+        }
+
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localVideo.srcObject = localStream;
+
+        toggleAudioButton.disabled = false;
+        toggleVideoButton.disabled = false;
+        startCallButton.disabled = true;
+
+        peerConnection = new RTCPeerConnection(configuration);
+
+        localStream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, localStream);
+        });
+
+        peerConnection.ontrack = (event) => {
+          if (remoteVideo.srcObject !== event.streams[0]) {
+            remoteVideo.srcObject = event.streams[0];
+          }
+        };
+
+        peerConnection.onicecandidate = (event) => {
+          if (event.candidate && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'ice-candidate', candidate: event.candidate }));
+          }
+        };
+
+        if (isOfferer) {
+          const offer = await peerConnection.createOffer();
+          await peerConnection.setLocalDescription(offer);
+          ws.send(JSON.stringify({ type: 'offer', sdp: peerConnection.localDescription }));
+        }
+
+      } catch (error) {
+        console.error("Error initializing WebRTC:", error);
+        startCallButton.disabled = false;
+        toggleAudioButton.disabled = true;
+        toggleVideoButton.disabled = true;
+        if (localStream) localStream.getTracks().forEach(t => t.stop());
+        localVideo.srcObject = null;
+        localStream = null;
+      }
+    }
+
+    startCallButton.disabled = true;
+    startCallButton.onclick = () => initWebRTC(true);
+    toggleAudioButton.disabled = true;
+    toggleVideoButton.disabled = true;
+
+    toggleAudioButton.onclick = () => {
+      const audioTrack = localStream?.getAudioTracks()?.[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        toggleAudioButton.textContent = audioTrack.enabled ? 'Toggle Audio (On)' : 'Toggle Audio (Off)';
+      }
+    };
+
+    toggleVideoButton.onclick = () => {
+      const videoTrack = localStream?.getVideoTracks()?.[0];
+      if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        toggleVideoButton.textContent = videoTrack.enabled ? 'Toggle Video (On)' : 'Toggle Video (Off)';
+      }
+    };
+  </script>
+</body>
+</html>

@@ -35,9 +35,11 @@
                     Log In
                 </button>
 
-                <a class="inline-block align-baseline font-semibold text-sm text-blue-500 hover:text-blue-800" href="{% url 'lawyer_register' %}">
-                    create account here
-                </a>
+               <p class="mt-4 text-center text-sm">
+  Don't have an account?
+  <a href="{% url 'lawyer_register' %}" class="text-blue-600 hover:underline">Register here</a>
+</p>
+
             </div>
         </form>
         <p class="text-center text-gray-500 text-xs mt-4">

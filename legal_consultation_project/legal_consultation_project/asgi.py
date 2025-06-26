@@ -29,22 +29,31 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 # })
 
 
+# legal_consultation_project/legal_consultation_project/asgi.py
+
 import os
-from channels.routing import ProtocolTypeRouter, URLRouter
-from django.core.asgi import get_asgi_application
+
 from channels.auth import AuthMiddlewareStack
-import ChatApp.routing
-import videochat.routing
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import AllowedHostsOriginValidator
+from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'legal_consultation_project.settings')
 
-django_asgi_app = get_asgi_application()
+# --- IMPORTANT CHANGE: Import routing from your app ---
+import video_app.routing # This line tells Python where to find your websocket_urlpatterns
+# ---
+import ChatApp.routing 
+ 
 
 application = ProtocolTypeRouter({
-    "http": django_asgi_app,
-    "websocket": AuthMiddlewareStack(
-        URLRouter(
-            ChatApp.routing.websocket_urlpatterns + videochat.routing.websocket_urlpatterns
+    "http": get_asgi_application(),
+    "websocket": AllowedHostsOriginValidator(
+        AuthMiddlewareStack(
+            URLRouter(
+                # --- IMPORTANT CHANGE: Reference the imported routing ---
+                video_app.routing.websocket_urlpatterns + ChatApp.routing.websocket_urlpatterns
+            )
         )
     ),
 })
